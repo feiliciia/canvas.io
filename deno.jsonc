@@ -1,0 +1,13 @@
+{
+  "fmt": {
+    "lineWidth": 160,
+    "useTabs": false,
+    "semiColons": true,
+    "singleQuote": false,
+    "indentWidth": 2
+  },
+  "unstable": [
+    "sloppy-imports",
+    "fmt-component"
+  ]
+}
