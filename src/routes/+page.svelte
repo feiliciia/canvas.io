@@ -73,25 +73,23 @@
     }
 
     draw(ctx: Context): void {
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 0.5;
       ctx.strokeStyle = "#CFD7DA";
       ctx.beginPath();
 
       const offsetX = camera.x % this.size;
       for (let x = 0; x < width; x += this.size) {
-        //ctx.moveTo(x, 0);
         ctx.moveTo(-offsetX + x, 0);
         ctx.lineTo(-offsetX + x, height);
-        ctx.stroke();
       }
 
       const offsetY = camera.y % this.size;
       for (let y = 0; y < height; y += this.size) {
         ctx.moveTo(0, -offsetY + y);
         ctx.lineTo(width, -offsetY + y);
-        ctx.stroke();
       }
 
+      ctx.stroke();
       ctx.closePath();
     }
   }
@@ -131,7 +129,7 @@
   let timeLast = 0;
 
   const grid: Grid = new Grid(20);
-  const player: Player = $state(new Player(0, 0, 60, randomColor(), 1, "."));
+  const player: Player = $state(new Player(0, 0, 60, randomColor(), 0.2, "."));
   //_ - this weird thing is default value for the thing i need no care about
   const foods: Blob[] = Array.from({ length: 500 }, (_, i) => {
     return new Blob(
@@ -160,8 +158,21 @@
     ctx.clearRect(0, 0, width, height);
 
     //mouse staff here!!!!!!! NO 0.1 ANYMORE JUST PAIN AND TEARS
-    player.x += clamp(x / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
-    player.y += clamp(y / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
+    // player.x += clamp(x / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
+    // player.y += clamp(y / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
+
+    const distanceMax = 0.25 * limit;
+    const distanceFromCenter = Math.hypot(x, y);
+    const distanceToMaxRatio = distanceMax / Math.max(distanceFromCenter, 0.00001);
+    const distance = clamp(distanceFromCenter, 0, distanceMax);
+
+    const normX = x * distanceToMaxRatio * distance / (distanceMax * distanceMax);
+    const normY = y * distanceToMaxRatio * distance / (distanceMax * distanceMax);
+
+    console.log(normX, normY);
+
+    player.x += normX * delta * player.speed;
+    player.y += normY * delta * player.speed;
 
     //map borders
     player.x = clamp(player.x, -MAP_SIZE / 2, MAP_SIZE / 2);
@@ -206,4 +217,4 @@
   {delta}
 </div>
 
-<canvas bind:this={canvas} {width} {height} class="absolute w-screen h-screen"></canvas>
+<canvas bind:this={canvas} {width} {height} class="absolute w-screen h-screen bg-[#F2FBFF]"></canvas>
