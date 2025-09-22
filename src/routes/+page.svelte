@@ -50,6 +50,15 @@
       this.color = color;
     }
 
+    static random(): Blob {
+      return new Blob(
+        Math.random() * MAP_SIZE - MAP_SIZE / 2,
+        Math.random() * MAP_SIZE - MAP_SIZE / 2,
+        3 + Math.random() * 3,
+        randomColor(),
+      );
+    }
+
     draw(ctx: Context) {
       const drawX = this.x - camera.x + width / 2;
       const drawY = this.y - camera.y + height / 2;
@@ -109,7 +118,7 @@
       super.draw(ctx);
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "black";
-      ctx.font = "60px Comic Sans MS";
+      ctx.font = "30px Comic Sans MS";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(this.name, width / 2, height / 2);
@@ -129,15 +138,11 @@
   let timeLast = 0;
 
   const grid: Grid = new Grid(20);
-  const player: Player = $state(new Player(0, 0, 60, randomColor(), 0.2, "."));
+  const player: Player = $state(new Player(0, 0, 16, randomColor(), 0.2, "Hello"));
+
   //_ - this weird thing is default value for the thing i need no care about
-  const foods: Blob[] = Array.from({ length: 500 }, (_, i) => {
-    return new Blob(
-      Math.random() * MAP_SIZE - MAP_SIZE / 2,
-      Math.random() * MAP_SIZE - MAP_SIZE / 2,
-      3 + Math.random() * 3,
-      randomColor(),
-    );
+  const foods: Blob[] = Array.from({ length: 2000 }, (_, i) => {
+    return Blob.random();
   });
 
   onMount(() => {
@@ -147,6 +152,7 @@
   });
 
   //drawing there everything!!!!!!!!!!😂😂😂😂😂😂😂😂😂😂😂
+  // logic first, then draw!!!!!!!!!!!!!!!! 🐍🐍
   function frame(time: number) {
     requestAnimationFrame(frame);
 
@@ -154,8 +160,6 @@
     //delta - time spent since the last frame was rendered
     delta = time - timeLast;
     timeLast = time;
-
-    ctx.clearRect(0, 0, width, height);
 
     //mouse staff here!!!!!!! NO 0.1 ANYMORE JUST PAIN AND TEARS
     // player.x += clamp(x / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
@@ -169,17 +173,27 @@
     const normX = x * distanceToMaxRatio * distance / (distanceMax * distanceMax);
     const normY = y * distanceToMaxRatio * distance / (distanceMax * distanceMax);
 
-    console.log(normX, normY);
-
     player.x += normX * delta * player.speed;
     player.y += normY * delta * player.speed;
 
-    //map borders
+    // map borders
     player.x = clamp(player.x, -MAP_SIZE / 2, MAP_SIZE / 2);
     player.y = clamp(player.y, -MAP_SIZE / 2, MAP_SIZE / 2);
 
     camera.x = player.x;
     camera.y = player.y;
+
+    for (let i = 0; i < foods.length; i++) {
+      const food = foods[i];
+
+      // food is inside player. yay.
+      if (isHalfCircleInside(food.x, food.y, food.radius, player.x, player.y, player.radius)) {
+        player.radius += Math.sqrt(food.radius) / Math.PI;
+        foods[i] = Blob.random();
+      }
+    }
+
+    ctx.clearRect(0, 0, width, height);
 
     grid.draw(ctx);
 
@@ -206,6 +220,51 @@
 
   function randomColor(): string {
     return colors[~~(Math.random() * colors.length)];
+  }
+
+  // chatgpt
+  function circleIntersectionArea(
+    x1: number,
+    y1: number,
+    r1: number,
+    x2: number,
+    y2: number,
+    r2: number,
+  ): number {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const d = Math.sqrt(dx * dx + dy * dy);
+
+    if (d >= r1 + r2) return 0;
+
+    if (d <= Math.abs(r1 - r2)) {
+      return Math.PI * Math.min(r1, r2) ** 2;
+    }
+
+    const alpha = Math.acos((d * d + r1 * r1 - r2 * r2) / (2 * d * r1));
+    const beta = Math.acos((d * d + r2 * r2 - r1 * r1) / (2 * d * r2));
+
+    const part1 = r1 * r1 * alpha;
+    const part2 = r2 * r2 * beta;
+    const part3 = 0.5 * Math.sqrt(
+      (-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2),
+    );
+
+    return part1 + part2 - part3;
+  }
+
+  // chatgpt
+  function isHalfCircleInside(
+    x1: number,
+    y1: number,
+    r1: number,
+    x2: number,
+    y2: number,
+    r2: number,
+  ): boolean {
+    const intersection = circleIntersectionArea(x1, y1, r1, x2, y2, r2);
+    const halfArea = 0.5 * Math.PI * r1 * r1;
+    return intersection >= halfArea;
   }
 </script>
 
