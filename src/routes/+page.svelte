@@ -14,16 +14,14 @@
   ];
 
   //creating😉 a🤞 constant🤓!😊
-  const MAP_SIZE = 5000 //😨
-  ; //semicolon!!!!!!!!!!!!!!!!!!!!☺😂
+  const MAP_SIZE = 5000;
+  const MAX_SPEED: number = 0.3;
 
   //alias - alternative for a name???
   type Context = CanvasRenderingContext2D;
 
-  //type Player = { x: number; y: number; size: number; speed: number };
   //interface for methods
   interface Drawable {
-    //🎨!
     draw(ctx: Context): void;
   }
 
@@ -59,6 +57,8 @@
       ctx.fillStyle = this.color;
       ctx.beginPath();
       ctx.moveTo(drawX, drawY);
+      //right half: ctx.arc(drawX, drawY, this.radius, Math.PI / 2, 1.5 * Math.PI);
+      //left half: ctx.arc(drawX, drawY, this.radius, 1.5 * Math.PI, 0.5 * Math.PI);
       ctx.arc(drawX, drawY, this.radius, 0, 2 * Math.PI);
       ctx.fill();
       ctx.closePath();
@@ -126,13 +126,12 @@
   let height = $state(0);
   let x = $state(0);
   let y = $state(0);
-  let limit = $derived(Math.min(width, height));
   let delta = $state(0);
-  const MAX_SPEED: number = 0.3;
+  let limit = $derived(Math.min(width, height));
   let timeLast = 0;
 
   const grid: Grid = new Grid(20);
-  const player: Player = $state(new Player(0, 0, 60, randomColor(), 1, "😂😂😂hhahahahahahah!!!!!!!!!!!!!!!😂😂😂"));
+  const player: Player = $state(new Player(0, 0, 60, randomColor(), 1, "."));
   //_ - this weird thing is default value for the thing i need no care about
   const foods: Blob[] = Array.from({ length: 500 }, (_, i) => {
     return new Blob(
@@ -149,26 +148,22 @@
     requestAnimationFrame(frame);
   });
 
-  function resize() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-  }
-
   //drawing there everything!!!!!!!!!!😂😂😂😂😂😂😂😂😂😂😂
   function frame(time: number) {
     requestAnimationFrame(frame);
 
+    const ctx = context!;
     //delta - time spent since the last frame was rendered
     delta = time - timeLast;
     timeLast = time;
 
-    const ctx = context!;
     ctx.clearRect(0, 0, width, height);
 
     //mouse staff here!!!!!!! NO 0.1 ANYMORE JUST PAIN AND TEARS
     player.x += clamp(x / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
     player.y += clamp(y / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
 
+    //map borders
     player.x = clamp(player.x, -MAP_SIZE / 2, MAP_SIZE / 2);
     player.y = clamp(player.y, -MAP_SIZE / 2, MAP_SIZE / 2);
 
@@ -184,6 +179,11 @@
     player.draw(ctx);
   }
 
+  function resize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+  }
+
   function onmousemove(event: MouseEvent) {
     x = event.x - 0.5 * width;
     y = event.y - 0.5 * height;
@@ -197,7 +197,9 @@
     return colors[~~(Math.random() * colors.length)];
   }
 </script>
+
 <svelte:window onresize={() => resize()} {onmousemove}></svelte:window>
+
 <div class="absolute z-1">
   {x},
   {y},
