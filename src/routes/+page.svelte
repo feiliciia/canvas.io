@@ -54,7 +54,7 @@
       return new Blob(
         Math.random() * MAP_SIZE - MAP_SIZE / 2,
         Math.random() * MAP_SIZE - MAP_SIZE / 2,
-        3 + Math.random() * 3,
+        3 + Math.random() * 30,
         randomColor(),
       );
     }
@@ -183,7 +183,7 @@
     camera.x = player.x;
     camera.y = player.y;
 
-    for (let i = 0; i < foods.length; i++) {
+    /*for (let i = 0; i < foods.length; i++) {
       const food = foods[i];
 
       // food is inside player. yay.
@@ -191,7 +191,8 @@
         player.radius += Math.sqrt(food.radius) / Math.PI;
         foods[i] = Blob.random();
       }
-    }
+    }*/
+    allBiggerBlobsAreGoingAfterTheSmallerMircoBrosBlobs();
 
     ctx.clearRect(0, 0, width, height);
 
@@ -220,6 +221,27 @@
 
   function randomColor(): string {
     return colors[~~(Math.random() * colors.length)];
+  }
+
+  function allBiggerBlobsAreGoingAfterTheSmallerMircoBrosBlobs() {
+    const allBlobs: Blob[] = [player, ...foods];
+
+    for (let i = 0; i < allBlobs.length; i++) {
+      const blob1 = allBlobs[i];
+
+      for (let j = 0; j < allBlobs.length; j++) {
+        const blob2 = allBlobs[j];
+
+        if (blob1 !== blob2) {
+          if (isHalfCircleInside(blob1.x, blob1.y, blob1.radius, blob2.x, blob2.y, blob2.radius)) {
+            blob1.radius += Math.sqrt(blob2.radius) / Math.PI;
+            //creating a new blob
+            foods[j] = Blob.random();
+          }
+        }
+      }
+      // food is inside player. yay.
+    }
   }
 
   // chatgpt
