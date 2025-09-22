@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   const colors: string[] = [
-    "#FF5733", // bright orange-red
+    "#FF5733", // bright orange-red🚗🚗🚗🚗🚗
     "#33FF57", // neon green
     "#3357FF", // vivid blue
     "#F1C40F", // bright yellow
@@ -13,7 +13,9 @@
     "#3498DB", // sky blue
   ];
 
-  const MAP_SIZE = 5000;
+  //creating😉 a🤞 constant🤓!😊
+  const MAP_SIZE = 5000 //😨
+  ; //semicolon!!!!!!!!!!!!!!!!!!!!☺😂
 
   //alias - alternative for a name???
   type Context = CanvasRenderingContext2D;
@@ -21,16 +23,17 @@
   //type Player = { x: number; y: number; size: number; speed: number };
   //interface for methods
   interface Drawable {
+    //🎨!
     draw(ctx: Context): void;
   }
 
-  class Camera {
-    x: number;
-    y: number;
+  class Camera { //📷
+    x: number; //🔢
+    y: number; //🔢
 
-    constructor(x: number, y: number) {
-      this.x = x;
-      this.y = y;
+    constructor(x: number, y: number) { //🚧
+      this.x = x; //❌
+      this.y = y; //😦
     }
   }
 
@@ -93,6 +96,7 @@
     }
   }
 
+  //😂😂😂😂😂
   class Player extends Blob {
     speed: number;
     name: string;
@@ -115,6 +119,7 @@
     }
   }
 
+  //😂😂😂😂
   let canvas: HTMLCanvasElement | undefined = $state();
   let context: CanvasRenderingContext2D | undefined = $state();
   let width = $state(0);
@@ -149,7 +154,7 @@
     height = window.innerHeight;
   }
 
-  //drawing there everything!!!!!!!!!!
+  //drawing there everything!!!!!!!!!!😂😂😂😂😂😂😂😂😂😂😂
   function frame(time: number) {
     requestAnimationFrame(frame);
 
