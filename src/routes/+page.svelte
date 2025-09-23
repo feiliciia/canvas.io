@@ -223,8 +223,10 @@
     return colors[~~(Math.random() * colors.length)];
   }
 
+  //robert, i haven't done it the way you said to do it so don't be 😨😈👿👿😈😈👺👹👹👿👿👹👿🥺hi ernest!!!!
   function allBiggerBlobsAreGoingAfterTheSmallerMircoBrosBlobs() {
     const allBlobs: Blob[] = [player, ...foods];
+    let eatenBlobs = [];
 
     for (let i = 0; i < allBlobs.length; i++) {
       const blob1 = allBlobs[i];
@@ -235,14 +237,58 @@
         if (blob1 !== blob2) {
           if (isHalfCircleInside(blob1.x, blob1.y, blob1.radius, blob2.x, blob2.y, blob2.radius)) {
             blob1.radius += Math.sqrt(blob2.radius) / Math.PI;
-            //creating a new blob
-            foods[j] = Blob.random();
+
+            eatenBlobs.push(blob2);
+
+            if (j < foods.length) {
+              foods[j] = Blob.random();
+            }
           }
         }
       }
       // food is inside player. yay.
     }
   }
+
+  /* blobs.sort((a, b) => b.radius - a.radius);
+
+function isPointInCircle(px: number, py: number, cx: number, cy: number, r: number) {
+  const squaredDistance = (px - cx) * (px - cx) + (py - cy) * (py - cy);
+  const squaredRadius = r * r;
+  return squaredDistance <= squaredRadius;
+}
+
+let theseFoodsWillBeEaten = [];
+
+for (let i = 0; i < blobs.length; i++) {
+    // this is the bigger blob
+    const blob = blobs[i];
+
+    // check all smaller blobs
+    const smallerBlobs = blobs.slice(i);
+
+    // check if any smaller blob is under the bigger blob
+    // i.e if the center of smaller blob is under any point of the bigger blob
+    for (let j = 0; j < smallerBlobs.length; j++) {
+        const smaller = smallerBlobs[j];
+
+        // ...
+        // `blob` eats `smaller` if yea
+        if (isPointInCircle(smaller.x, smaller.y, blob.x, blob.y, blob.radius)) {
+            console.log("EAT!");
+            // if blob is food, replace it with a new one somewhere else
+            // only replace after we're done eating ok?!
+
+            theseFoodsWillBeEaten.push(smaller);
+        }
+    }
+}
+
+for (const toBeReplaced of theseFoodsWillBeEaten) {
+    Object.assign(toBeReplaced, randomBlob());
+}
+
+// and then we draw.*/
 
   // chatgpt
   function circleIntersectionArea(
