@@ -1,4 +1,5 @@
 <script lang="ts">
+  //welcome, ernest!!!😈                                                                             enjoy.
   import { onMount } from "svelte";
   const colors: string[] = [
     "#FF5733", // bright orange-red🚗🚗🚗🚗🚗
@@ -161,7 +162,7 @@
     delta = time - timeLast;
     timeLast = time;
 
-    //mouse staff here!!!!!!! NO 0.1 ANYMORE JUST PAIN AND TEARS
+    //mouse staff here!!!!!!! NO 0.1 ANYMORE JUST PAIN AND TEARS| hi, ernest!😈
     // player.x += clamp(x / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
     // player.y += clamp(y / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
 
@@ -182,16 +183,6 @@
 
     camera.x = player.x;
     camera.y = player.y;
-
-    /*for (let i = 0; i < foods.length; i++) {
-      const food = foods[i];
-
-      // food is inside player. yay.
-      if (isHalfCircleInside(food.x, food.y, food.radius, player.x, player.y, player.radius)) {
-        player.radius += Math.sqrt(food.radius) / Math.PI;
-        foods[i] = Blob.random();
-      }
-    }*/
 
     allBiggerBlobsAreGoingAfterTheSmallerMircoBrosBlobs();
 
@@ -224,16 +215,12 @@
     return colors[~~(Math.random() * colors.length)];
   }
 
-  // robert, i haven't done it the way you said to do it so don't be 😨😈👿👿😈😈👺👹👹👿👿👹👿🥺hi ernest!!!!
+  // robert was not like 😨😈👿👿😈😈👺👹👹👿👿👹👿🥺hi ernest!!!!you are being rude for not answering:_(🥺
   function allBiggerBlobsAreGoingAfterTheSmallerMircoBrosBlobs() {
-    // LISA!!!! FIXME: hold WHAT was eaten and WHO ate it.
-    // we need this information to add the mass to the eater later.
-    // type should be `[Blob, Blob][]`
-    // [T1, T2, ...] is called a tuple array, more info:
     // https://www.w3schools.com/typescript/typescript_tuples.php
-    const eatenFoods: Blob[] = [];
+    const eatenFoods: [Blob, Blob][] = []; //if readonly -- ([])[]
 
-    // Normally, food in agar.io is equally sized and should not be sorted at all
+    // IGNOREFORNOW: Normally, food in agar.io is equally sized and should not be sorted at all
     // food should be drawn first, then draw all the sorted (small -> big) players.
     // We keep this for now since food size is random and we don't care about performance.
     foods.sort((a, b) => b.radius - a.radius);
@@ -249,133 +236,28 @@
 
       // we'll remove or replace it later, after we're done iterating through all blobs
       if (insidePlayerBlob && smallEnough) {
-        eatenFoods.push(food);
+        eatenFoods.push([food, player]);
       }
     }
 
     // should handle both food and non-food blobs; leave as is for now
-    for (const eatenFood of eatenFoods) {
-      Object.assign(eatenFood, Blob.random());
+    for (const [food, player] of eatenFoods) {
+      //adding the food to the player
+      const playerV = Math.pow(player.radius, 2);
+      const foodV = Math.pow(food.radius, 2);
+
+      player.radius = Math.sqrt(playerV + foodV);
+
+      //new food!
+      Object.assign(food, Blob.random());
     }
-
-    /*
-    for (let i = 0; i < foods.length; i++) {
-      // const playerBlob = allBlobs[i];
-
-      //smaller blobs(food) array, added +1 because other way it goes crazy
-      const smallerFoods = foods.slice(i + 1);
-
-      for (let j = 0; j < foodBlobs.length; j++) {
-        const food = foodBlobs[j];
-
-        // if (blob1 !== blob2) {//need to do it somehow
-        if (isHalfCircleInside(player.x, player.y, player.radius, food.x, food.y, food.radius) && player.radius > food.radius) {
-          player.radius += Math.sqrt(food.radius) / Math.PI;
-
-          //push the blobs that were eaten
-          eatenBlobs.push(food);
-        }
-        //}
-      }
-    }*/
-
-    // robert, used your staff here
-    /*
-    for (const eatenFood of eatenFoods) {
-      Object.assign(eatenFood, Blob.random());
-    }*/
   }
-
-  /* blobs.sort((a, b) => b.radius - a.radius);
-
-function isPointInCircle(px: number, py: number, cx: number, cy: number, r: number) {
-  const squaredDistance = (px - cx) * (px - cx) + (py - cy) * (py - cy);
-  const squaredRadius = r * r;
-  return squaredDistance <= squaredRadius;
-}
-
-let theseFoodsWillBeEaten = [];
-
-for (let i = 0; i < blobs.length; i++) {
-    // this is the bigger blob
-    const blob = blobs[i];
-
-    // check all smaller blobs
-    const smallerBlobs = blobs.slice(i);
-
-    // check if any smaller blob is under the bigger blob
-    // i.e if the center of smaller blob is under any point of the bigger blob
-    for (let j = 0; j < smallerBlobs.length; j++) {
-        const smaller = smallerBlobs[j];
-
-        // ...
-        // `blob` eats `smaller` if yea
-        if (isPointInCircle(smaller.x, smaller.y, blob.x, blob.y, blob.radius)) {
-            console.log("EAT!");
-            // if blob is food, replace it with a new one somewhere else
-            // only replace after we're done eating ok?!
-
-            theseFoodsWillBeEaten.push(smaller);
-        }
-    }
-}
-
-for (const toBeReplaced of theseFoodsWillBeEaten) {
-    Object.assign(toBeReplaced, randomBlob());
-}
-
-// and then we draw.*/
 
   function isPointInCircle(px: number, py: number, cx: number, cy: number, r: number): boolean {
     const dx = px - cx;
     const dy = py - cy;
     const distanceSquared = dx * dx + dy * dy;
     return distanceSquared <= r * r;
-  }
-
-  // chatgpt
-  function circleIntersectionArea(
-    x1: number,
-    y1: number,
-    r1: number,
-    x2: number,
-    y2: number,
-    r2: number,
-  ): number {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const d = Math.sqrt(dx * dx + dy * dy);
-
-    if (d >= r1 + r2) return 0;
-
-    if (d <= Math.abs(r1 - r2)) {
-      return Math.PI * Math.min(r1, r2) ** 2;
-    }
-
-    const alpha = Math.acos((d * d + r1 * r1 - r2 * r2) / (2 * d * r1));
-    const beta = Math.acos((d * d + r2 * r2 - r1 * r1) / (2 * d * r2));
-
-    const part1 = r1 * r1 * alpha;
-    const part2 = r2 * r2 * beta;
-    const part3 = 0.5 * Math.sqrt(
-      (-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2),
-    );
-
-    return part1 + part2 - part3;
-  }
-
-  // chatgpt
-  function isHalfCircleInside(
-    x1: number,
-    y1: number,
-    r1: number,
-    x2: number,
-    y2: number,
-    r2: number,
-  ): boolean {
-    const intersection = circleIntersectionArea(x1, y1, r1, x2, y2, r2);
-    const halfArea = 0.5 * Math.PI * r1 * r1;
-    return intersection >= halfArea;
   }
 </script>
 
