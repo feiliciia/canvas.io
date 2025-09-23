@@ -34,6 +34,15 @@
       this.x = x; //❌
       this.y = y; //😦
     }
+
+    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
+    calculatePosition(player: Player) {
+      const averageX = player.blobs.reduce((accumulator, blob) => accumulator + blob.x, 0) / player.blobs.length; //adding to the 0 the blob.x and so on, hi ernest
+      const averageY = player.blobs.reduce((accumulator, blob) => accumulator + blob.y, 0) / player.blobs.length; //for y, same
+
+      this.x = averageX;
+      this.y = averageY;
+    }
   }
 
   const camera = $state(new Camera(0, 0));
@@ -43,20 +52,26 @@
     y: number;
     radius: number;
     color: string;
+    speed: number;
+    //no name now because its buged womp womp, ernest be very sad
+    name?: string; //? kinda mostly the same as | undefined
 
-    constructor(x: number, y: number, radius: number, color: string) {
+    constructor(x: number, y: number, radius: number, color: string, speed: number, name?: string) {
       this.x = x;
       this.y = y;
       this.radius = radius;
       this.color = color;
+      this.speed = speed;
+      this.name = name;
     }
 
     static random(): Blob {
       return new Blob(
         Math.random() * MAP_SIZE - MAP_SIZE / 2,
         Math.random() * MAP_SIZE - MAP_SIZE / 2,
-        3 + Math.random() * 30,
+        3 + Math.random() * 15,
         randomColor(),
+        0.2,
       );
     }
 
@@ -105,29 +120,43 @@
   }
 
   //😂😂😂😂😂
-  class Player extends Blob {
-    speed: number;
+  class Player implements Drawable {
+    blobs: Blob[];
+    color: string;
     name: string;
 
-    constructor(x: number, y: number, radius: number, color: string, speed: number, name: string) {
-      super(x, y, radius, color);
-      this.speed = speed;
+    constructor(color: string, name: string) {
+      const blob = Blob.random();
+      const blob2 = Blob.random();
+      blob.color = color;
+      blob.name = name;
+      blob.radius = 20;
+
+      blob2.color = color;
+      blob2.name = name;
+      blob2.radius = 40;
+
+      this.blobs = [blob, blob2];
+      this.color = color;
       this.name = name;
     }
 
     draw(ctx: Context) {
-      super.draw(ctx);
-      ctx.fillStyle = "#ffffff";
-      ctx.strokeStyle = "black";
-      ctx.font = "30px Comic Sans MS";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(this.name, width / 2, height / 2);
-      ctx.strokeText(this.name, width / 2, height / 2);
+      for (const blob of this.blobs) {
+        blob.draw(ctx);
+      }
+
+      // ctx.fillStyle = "#ffffff";
+      // ctx.strokeStyle = "black";
+      // ctx.font = "30px Comic Sans MS";
+      // ctx.textAlign = "center";
+      // ctx.textBaseline = "middle";
+      // ctx.fillText(this.name, width / 2, height / 2);
+      // ctx.strokeText(this.name, width / 2, height / 2);
     }
   }
 
-  //😂😂😂😂
+  //😂😂😂😂hi, ernest, you are welcomed again!
   let canvas: HTMLCanvasElement | undefined = $state();
   let context: CanvasRenderingContext2D | undefined = $state();
   let width = $state(0);
@@ -139,7 +168,7 @@
   let timeLast = 0;
 
   const grid: Grid = new Grid(20);
-  const player: Player = $state(new Player(0, 0, 16, randomColor(), 0.2, "Hello"));
+  const player: Player = $state(new Player(randomColor(), "ernest, hi"));
 
   //_ - this weird thing is default value for the thing i need no care about
   const foods: Blob[] = Array.from({ length: 2000 }, (_, i) => {
@@ -165,24 +194,33 @@
     //mouse staff here!!!!!!! NO 0.1 ANYMORE JUST PAIN AND TEARS| hi, ernest!😈
     // player.x += clamp(x / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
     // player.y += clamp(y / limit, -MAX_SPEED, MAX_SPEED) * delta * player.speed;
+    for (const playerBlob of player.blobs) {
+      // const relativeBlobX = playerBlob.x - camera.x + x;
+      // const relativeBlobY = playerBlob.y - camera.y + y;
+      const relativeBlobX = x;
+      const relativeBlobY = y;
 
-    const distanceMax = 0.25 * limit;
-    const distanceFromCenter = Math.hypot(x, y);
-    const distanceToMaxRatio = distanceMax / Math.max(distanceFromCenter, 0.00001);
-    const distance = clamp(distanceFromCenter, 0, distanceMax);
+      const distanceMax = 0.25 * limit;
+      const distanceFromCenter = Math.hypot(relativeBlobX, relativeBlobY);
+      const distanceToMaxRatio = distanceMax / Math.max(distanceFromCenter, 0.00001);
+      const distance = clamp(distanceFromCenter, 0, distanceMax);
 
-    const normX = x * distanceToMaxRatio * distance / (distanceMax * distanceMax);
-    const normY = y * distanceToMaxRatio * distance / (distanceMax * distanceMax);
+      const normX = relativeBlobX * distanceToMaxRatio * distance / (distanceMax * distanceMax);
+      const normY = relativeBlobY * distanceToMaxRatio * distance / (distanceMax * distanceMax);
 
-    player.x += normX * delta * player.speed;
-    player.y += normY * delta * player.speed;
+      //speed gets down when its bigger size
+      playerBlob.speed = 20 / playerBlob.radius;
+      console.log(playerBlob.speed);
 
-    // map borders
-    player.x = clamp(player.x, -MAP_SIZE / 2, MAP_SIZE / 2);
-    player.y = clamp(player.y, -MAP_SIZE / 2, MAP_SIZE / 2);
+      playerBlob.x += normX * delta * playerBlob.speed;
+      playerBlob.y += normY * delta * playerBlob.speed;
 
-    camera.x = player.x;
-    camera.y = player.y;
+      // map borders
+      playerBlob.x = clamp(playerBlob.x, -MAP_SIZE / 2, MAP_SIZE / 2);
+      playerBlob.y = clamp(playerBlob.y, -MAP_SIZE / 2, MAP_SIZE / 2);
+    }
+
+    camera.calculatePosition(player);
 
     allBiggerBlobsAreGoingAfterTheSmallerMircoBrosBlobs();
 
@@ -225,28 +263,28 @@
     // We keep this for now since food size is random and we don't care about performance.
     foods.sort((a, b) => b.radius - a.radius);
 
-    for (let i = 0; i < foods.length; i++) {
-      const food = foods[i];
+    for (const playerBlob of player.blobs) {
+      for (const food of foods) {
+        // check if the center of a smaller blob is under the bigger blob
+        const insidePlayerBlob = isPointInCircle(food.x, food.y, playerBlob.x, playerBlob.y, playerBlob.radius);
 
-      // check if the center of a smaller blob is under the bigger blob
-      const insidePlayerBlob = isPointInCircle(food.x, food.y, player.x, player.y, player.radius);
+        // check if it's small enough to be eaten
+        const smallEnough = playerBlob.radius >= food.radius * 1.1;
 
-      // check if it's small enough to be eaten
-      const smallEnough = player.radius >= food.radius * 1.1;
-
-      // we'll remove or replace it later, after we're done iterating through all blobs
-      if (insidePlayerBlob && smallEnough) {
-        eatenFoods.push([food, player]);
+        // we'll remove or replace it later, after we're done iterating through all blobs
+        if (insidePlayerBlob && smallEnough) {
+          eatenFoods.push([food, playerBlob]);
+        }
       }
     }
 
     // should handle both food and non-food blobs; leave as is for now
-    for (const [food, player] of eatenFoods) {
+    for (const [food, playerBlob] of eatenFoods) {
       //adding the food to the player
-      const playerV = Math.pow(player.radius, 2);
+      const playerV = Math.pow(playerBlob.radius, 2);
       const foodV = Math.pow(food.radius, 2);
 
-      player.radius = Math.sqrt(playerV + foodV);
+      playerBlob.radius = Math.sqrt(playerV + foodV);
 
       //new food!
       Object.assign(food, Blob.random());
