@@ -192,6 +192,7 @@
         foods[i] = Blob.random();
       }
     }*/
+
     allBiggerBlobsAreGoingAfterTheSmallerMircoBrosBlobs();
 
     ctx.clearRect(0, 0, width, height);
@@ -223,37 +224,66 @@
     return colors[~~(Math.random() * colors.length)];
   }
 
-  //robert, i haven't done it the way you said to do it so don't be 😨😈👿👿😈😈👺👹👹👿👿👹👿🥺hi ernest!!!!
+  // robert, i haven't done it the way you said to do it so don't be 😨😈👿👿😈😈👺👹👹👿👿👹👿🥺hi ernest!!!!
   function allBiggerBlobsAreGoingAfterTheSmallerMircoBrosBlobs() {
-    const allBlobs: Blob[] = [player, ...foods];
-    let eatenBlobs = [];
+    // LISA!!!! FIXME: hold WHAT was eaten and WHO ate it.
+    // we need this information to add the mass to the eater later.
+    // type should be `[Blob, Blob][]`
+    // [T1, T2, ...] is called a tuple array, more info:
+    // https://www.w3schools.com/typescript/typescript_tuples.php
+    const eatenFoods: Blob[] = [];
 
-    //sorting all blobs(player included) so the big one is first
-    allBlobs.sort((a, b) => b.radius - a.radius);
+    // Normally, food in agar.io is equally sized and should not be sorted at all
+    // food should be drawn first, then draw all the sorted (small -> big) players.
+    // We keep this for now since food size is random and we don't care about performance.
+    foods.sort((a, b) => b.radius - a.radius);
 
-    for (let i = 0; i < allBlobs.length; i++) {
-      const playerBlob = allBlobs[i];
+    for (let i = 0; i < foods.length; i++) {
+      const food = foods[i];
+
+      // check if the center of a smaller blob is under the bigger blob
+      const insidePlayerBlob = isPointInCircle(food.x, food.y, player.x, player.y, player.radius);
+
+      // check if it's small enough to be eaten
+      const smallEnough = player.radius >= food.radius * 1.1;
+
+      // we'll remove or replace it later, after we're done iterating through all blobs
+      if (insidePlayerBlob && smallEnough) {
+        eatenFoods.push(food);
+      }
+    }
+
+    // should handle both food and non-food blobs; leave as is for now
+    for (const eatenFood of eatenFoods) {
+      Object.assign(eatenFood, Blob.random());
+    }
+
+    /*
+    for (let i = 0; i < foods.length; i++) {
+      // const playerBlob = allBlobs[i];
 
       //smaller blobs(food) array, added +1 because other way it goes crazy
-      const foodBlobs = allBlobs.slice(i + 1);
+      const smallerFoods = foods.slice(i + 1);
 
       for (let j = 0; j < foodBlobs.length; j++) {
         const food = foodBlobs[j];
+
         // if (blob1 !== blob2) {//need to do it somehow
-        if (isHalfCircleInside(playerBlob.x, playerBlob.y, playerBlob.radius, food.x, food.y, food.radius)) {
-          playerBlob.radius += Math.sqrt(food.radius) / Math.PI;
+        if (isHalfCircleInside(player.x, player.y, player.radius, food.x, food.y, food.radius) && player.radius > food.radius) {
+          player.radius += Math.sqrt(food.radius) / Math.PI;
 
           //push the blobs that were eaten
           eatenBlobs.push(food);
         }
         //}
       }
-    }
+    }*/
 
-    //robert, used your staff here
-    for (const replaced of eatenBlobs) {
-      Object.assign(replaced, Blob.random());
-    }
+    // robert, used your staff here
+    /*
+    for (const eatenFood of eatenFoods) {
+      Object.assign(eatenFood, Blob.random());
+    }*/
   }
 
   /* blobs.sort((a, b) => b.radius - a.radius);
@@ -295,6 +325,13 @@ for (const toBeReplaced of theseFoodsWillBeEaten) {
 }
 
 // and then we draw.*/
+
+  function isPointInCircle(px: number, py: number, cx: number, cy: number, r: number): boolean {
+    const dx = px - cx;
+    const dy = py - cy;
+    const distanceSquared = dx * dx + dy * dy;
+    return distanceSquared <= r * r;
+  }
 
   // chatgpt
   function circleIntersectionArea(
