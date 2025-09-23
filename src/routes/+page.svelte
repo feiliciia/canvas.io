@@ -228,25 +228,31 @@
     const allBlobs: Blob[] = [player, ...foods];
     let eatenBlobs = [];
 
+    //sorting all blobs(player included) so the big one is first
+    allBlobs.sort((a, b) => b.radius - a.radius);
+
     for (let i = 0; i < allBlobs.length; i++) {
-      const blob1 = allBlobs[i];
+      const playerBlob = allBlobs[i];
 
-      for (let j = 0; j < allBlobs.length; j++) {
-        const blob2 = allBlobs[j];
+      //smaller blobs(food) array, added +1 because other way it goes crazy
+      const foodBlobs = allBlobs.slice(i + 1);
 
-        if (blob1 !== blob2) {
-          if (isHalfCircleInside(blob1.x, blob1.y, blob1.radius, blob2.x, blob2.y, blob2.radius)) {
-            blob1.radius += Math.sqrt(blob2.radius) / Math.PI;
+      for (let j = 0; j < foodBlobs.length; j++) {
+        const food = foodBlobs[j];
+        // if (blob1 !== blob2) {//need to do it somehow
+        if (isHalfCircleInside(playerBlob.x, playerBlob.y, playerBlob.radius, food.x, food.y, food.radius)) {
+          playerBlob.radius += Math.sqrt(food.radius) / Math.PI;
 
-            eatenBlobs.push(blob2);
-
-            if (j < foods.length) {
-              foods[j] = Blob.random();
-            }
-          }
+          //push the blobs that were eaten
+          eatenBlobs.push(food);
         }
+        //}
       }
-      // food is inside player. yay.
+    }
+
+    //robert, used your staff here
+    for (const replaced of eatenBlobs) {
+      Object.assign(replaced, Blob.random());
     }
   }
 
