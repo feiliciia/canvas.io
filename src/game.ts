@@ -159,7 +159,7 @@ export class Game {
 
   constructor(renderer: Renderer, localPlayer: Player) {
     this.renderer = renderer;
-    this.world = new World(5000);
+    this.world = new World(10000);
     this.id = "abc";
     this.tickrate = 60;
     this.localPlayer = localPlayer;
@@ -167,7 +167,7 @@ export class Game {
     this.world.players.push(localPlayer);
 
     // this would be populated from the server
-    for (let i = 0; i < 1000; i += 1) {
+    for (let i = 0; i < 4096; i += 1) {
       const x = -(this.world.size / 2) + Math.random() * this.world.size;
       const y = -(this.world.size / 2) + Math.random() * this.world.size;
       const mass = 100 + Math.random() * 100;
@@ -175,8 +175,6 @@ export class Game {
     }
   }
 
-  // all physics / interpolations need delta time
-  // we process this every frame
   process(delta: number) {
     for (const player of this.world.players) {
       for (const part of player.parts) {

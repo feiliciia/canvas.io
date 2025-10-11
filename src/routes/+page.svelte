@@ -1,55 +1,6 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { Game, Player, Renderer } from "../game";
-  import { clamp, randomColor, textureColor } from "../util";
-
-  // //welcome, ernest!!!😈                                                                             enjoy.
-  // import { onMount } from "svelte";
-  // const colors: string[] = [
-  //   "#FF5733", // bright orange-red🚗🚗🚗🚗🚗
-  //   "#33FF57", // neon green
-  //   "#3357FF", // vivid blue
-  //   "#F1C40F", // bright yellow
-  //   "#9B59B6", // purple
-  //   "#E67E22", // orange
-  //   "#1ABC9C", // teal
-  //   "#E84393", // pink
-  //   "#2ECC71", // fresh green
-  //   "#3498DB", // sky blue
-  // ];
-
-  // //creating😉 a🤞 constant🤓!😊
-  // const MAP_SIZE = 5000;
-  // const MAX_SPEED: number = 0.3;
-
-  // //alias - alternative for a name???
-  // type Context = CanvasRenderingContext2D;
-
-  // //interface for methods
-  // interface Drawable {
-  //   draw(ctx: Context): void;
-  // }
-
-  // class Camera { //📷
-  //   x: number; //🔢
-  //   y: number; //🔢
-
-  //   constructor(x: number, y: number) { //🚧
-  //     this.x = x; //❌
-  //     this.y = y; //😦
-  //   }
-
-  //   //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-  //   calculatePosition(player: Player) {
-  //     const averageX = player.blobs.reduce((accumulator, blob) => accumulator + blob.x, 0) / player.blobs.length; //adding to the 0 the blob.x and so on, hi ernest
-  //     const averageY = player.blobs.reduce((accumulator, blob) => accumulator + blob.y, 0) / player.blobs.length; //for y, same
-
-  //     this.x = averageX;
-  //     this.y = averageY;
-  //   }
-  // }
-
-  // const camera = $state(new Camera(0, 0));
+  import Scene from "../ui/Scene.svelte";
+  import Overlay from "../ui/Overlay.svelte";
 
   // class Blob implements Drawable {
   //   x: number;
@@ -302,78 +253,19 @@
   //   return distanceSquared <= r * r;
   // }
 
-  let canvas: HTMLCanvasElement | undefined = $state();
-  let game: Game | undefined = undefined;
-
-  let width = $state(0);
-  let height = $state(0);
-  let limit = $derived(Math.min(width, height));
-
-  function onmousemove(event: MouseEvent) {
-    const x = event.x - 0.5 * width;
-    const y = event.y - 0.5 * height;
-
-    const relativeBlobX = x;
-    const relativeBlobY = y;
-
-    const distanceMax = 0.25 * limit;
-    const distanceFromCenter = Math.hypot(relativeBlobX, relativeBlobY);
-    const distanceToMaxRatio = distanceMax / Math.max(distanceFromCenter, 0.00001);
-    const distance = clamp(distanceFromCenter, 0, distanceMax);
-
-    const vx = relativeBlobX * distanceToMaxRatio * distance / (distanceMax * distanceMax);
-    const vy = relativeBlobY * distanceToMaxRatio * distance / (distanceMax * distanceMax);
-
-    for (const part of game!.localPlayer.parts) {
-      part.vx = vx;
-      part.vy = vy;
-    }
-  }
-
-  let last = 0;
-
-  function frame(time: number) {
-    requestAnimationFrame(frame);
-
-    const delta = time - last;
-    last = time;
-
-    game!.process(delta);
-    game!.world.draw(game!.renderer);
-  }
-
-  onMount(() => {
-    // initialize the renderer
-    const context = canvas!.getContext("2d")!;
-    const renderer = new Renderer(context, width, height);
-
-    // resize the renderer whenever canvas resizes
-    canvas!.onresize = () => {
-      renderer!.width = canvas!.width;
-      renderer!.height = canvas!.height;
-    };
-
-    // TODO: in the future, load the game from server
-    const localPlayer = new Player(0, 0, 2000, textureColor(randomColor()), "Peter");
-    game = new Game(renderer, localPlayer);
-
-    requestAnimationFrame(frame);
-  });
+  let scene: Scene | undefined = $state();
 </script>
 
-<svelte:window {onmousemove}></svelte:window>
+<svelte:window onmousemove={scene?.onmousemove} {onresize}></svelte:window>
 
 <svelte:head>
   <title>lisa.io</title>
+  <link rel="icon" href="/favicon.png">
 </svelte:head>
 
-<div class="absolute z-1 p-2 flex flex-col"></div>
+<Scene bind:this={scene}></Scene>
 
-<canvas
-  bind:this={canvas}
-  bind:clientWidth={width}
-  bind:clientHeight={height}
-  {width}
-  {height}
-  class="absolute w-screen h-screen bg-[#F2FBFF]"
-></canvas>
+<!-- `scene` isn't available immediately -->
+{#if scene}
+  <Overlay game={scene.game!}></Overlay>
+{/if}
