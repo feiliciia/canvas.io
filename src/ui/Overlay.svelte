@@ -1,17 +1,11 @@
 <script lang="ts">
-  import { Player } from "../game/player";
-  import type { Global } from "./Scene.svelte";
-
-  type Props = {
-    global: Global;
-  };
-
-  let { global }: Props = $props();
+  import { Player } from "../game/player.svelte";
+  import { global } from "../game/global.svelte";
+  import * as Icon from "lucide-svelte";
 
   let score = $derived.by(() => {
     const totalMass = global.localPlayer?.cells.reduce((acc, cell) => acc + cell.mass, 0) ?? 0;
-    const radius = Math.sqrt(totalMass / Math.PI);
-    return ~~radius;
+    return ~~Math.pow(totalMass, 0.6);
   });
 
   let topPlayers: Player[] = $derived.by(() => {
@@ -28,7 +22,7 @@
 <div class="absolute z-1 grid w-full h-full pointer-events-none text-white">
   {#if global.world}
     {#if global.localPlayer?.alive}
-      <div class="absolute m-4 px-2 py-1 rounded-lg bg-black/40 self-end">
+      <div class="absolute m-4 px-4 py-2 bg-black/40 self-end">
         <span class="font-bold text-2xl">Score: {score}</span>
       </div>
     {/if}
@@ -39,4 +33,16 @@
       {/each}
     </div>
   {/if}
+  <div class="absolute m-4 bg-black/40 justify-self-end self-end flex p-4 gap-2">
+    <button class="pointer-events-auto cursor-pointer" onclick={() => global.sfx.muted = !global.sfx.muted}>
+      {#if global.sfx.muted}
+        <Icon.VolumeX />
+      {:else}
+        <Icon.Volume2 />
+      {/if}
+    </button>
+  </div>
+  <div class="absolute m-4 bg-black/40 flex p-4 gap-2">
+    <span class="font-bold">Zoom: {(global.renderer?.camera.zoom ?? 1).toFixed(2)}x</span>
+  </div>
 </div>

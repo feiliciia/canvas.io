@@ -1,4 +1,4 @@
-import { Cell } from "./cell.ts";
+import { Cell } from "./cell.svelte.ts";
 import { randomColor, type Texture, textureColor } from "./common.ts";
 
 export class Food extends Cell {
@@ -9,7 +9,7 @@ export class Food extends Cell {
   static random(size: number): Food {
     const x = -(size / 2) + Math.random() * size;
     const y = -(size / 2) + Math.random() * size;
-    const mass = 100 + Math.random() * 100;
+    const mass = 50 + Math.random() * 25;
 
     return new Food(x, y, mass, textureColor(randomColor()));
   }

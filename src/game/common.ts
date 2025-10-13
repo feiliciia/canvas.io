@@ -1,6 +1,7 @@
 import { Renderer } from "./renderer.ts";
 
-export type Color = { kind: "color"; hex: string };
+export type Hsl = [number, number, number];
+export type Color = { kind: "color"; hslFill: Hsl; hslOutline: Hsl; fill: string; outline: string };
 export type Image = { kind: "image"; src: string };
 
 // blobs can have a solid color or an image
@@ -10,23 +11,26 @@ export interface Drawable {
   draw(renderer: Renderer): void;
 }
 
-const colors: string[] = [
-  "#FF5733", // bright orange-red🚗🚗🚗🚗🚗
-  "#33FF57", // neon green
-  "#3357FF", // vivid blue
-  "#F1C40F", // bright yellow
-  "#9B59B6", // purple
-  "#E67E22", // orange
-  "#1ABC9C", // teal
-  "#E84393", // pink
-  "#2ECC71", // fresh green
-  "#3498DB", // sky blue
+const colors: Hsl[] = [
+  [10.588, 1.000, 0.600], // #FF5733
+  [229.412, 1.000, 0.600], // #3357FF
+  [48.053, 0.889, 0.502], // #F1C40F
+  [282.581, 0.389, 0.532], // #9B59B6
+  [28.163, 0.797, 0.518], // #E67E22
+  [168.148, 0.757, 0.419], // #1ABC9C
+  [330.909, 0.782, 0.586], // #E84393
+  [145.443, 0.633, 0.490], // #2ECC71
+  [204.072, 0.699, 0.531], // #3498DB
 ];
 
-export function textureColor(hex: string): Color {
+export function textureColor([h, s, l]: Hsl): Color {
+  const lOutline = Math.max(l - 0.1, 0);
   return {
     kind: "color",
-    hex,
+    hslFill: [h, s, l],
+    hslOutline: [h, s, lOutline],
+    fill: `hsl(${h}deg, ${s * 100}%, ${l * 100}%)`,
+    outline: `hsl(${h}deg, ${s * 100}%, ${lOutline * 100}%)`,
   };
 }
 
@@ -45,6 +49,6 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-export function randomColor(): string {
+export function randomColor(): Hsl {
   return colors[~~(Math.random() * colors.length)];
 }

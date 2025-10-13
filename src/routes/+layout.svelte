@@ -6,7 +6,6 @@
 
 <svelte:head>
   <title>lisa.io</title>
-  <link rel="icon" href="/favicon.png">
 </svelte:head>
 
 {@render children?.()}

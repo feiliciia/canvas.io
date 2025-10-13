@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import { Camera } from "./camera.ts";
+import { Camera } from "./camera.svelte.ts";
 
 export class Renderer {
   // where is our camera?
@@ -9,6 +9,8 @@ export class Renderer {
   // the canvas and its 2d context
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
+
+  delta: number;
 
   get width(): number {
     return this.canvas.width;
@@ -22,5 +24,6 @@ export class Renderer {
     this.camera = new Camera();
     this.canvas = canvas;
     this.context = context;
+    this.delta = 0;
   }
 }

@@ -1,26 +1,11 @@
-<script module lang="ts">
-  export type Global = {
-    width: number;
-    height: number;
-    canvas?: HTMLCanvasElement;
-    renderer?: Renderer;
-    world?: World;
-    localPlayer?: Player;
-  };
-</script>
-
 <script lang="ts">
+  import Overlay from "./Overlay.svelte";
   import { onMount } from "svelte";
   import { World } from "../game/world.svelte";
   import { Renderer } from "../game/renderer";
-  import { Player } from "../game/player";
-
-  let global: Global = $state({
-    width: 0,
-    height: 0,
-  });
-
-  export { global };
+  import { Sound } from "../game/sfx.svelte";
+  import { global } from "../game/global.svelte";
+  import { clamp } from "../game/common";
 
   function onmousemove(event: MouseEvent) {
     if (!global.renderer || !global.world || !global.localPlayer) {
@@ -40,14 +25,31 @@
       return;
     }
 
+    if (global.keys.get(event.code) === true) {
+      return;
+    }
+
     switch (event.code) {
       case "Space":
-        global.localPlayer.split();
+        event.preventDefault();
+        global.localPlayer.split(global);
         break;
     }
+
+    global.keys.set(event.code, true);
+  }
+
+  function onwheel(event: WheelEvent) {
+    global.renderer?.camera.onWheel(clamp(event.deltaY, -1, 1));
+  }
+
+  function onkeyup(event: KeyboardEvent) {
+    global.keys.set(event.code, false);
   }
 
   onMount(async () => {
+    await global.sfx.initialize();
+
     const context = global.canvas!.getContext("2d")!;
 
     global.renderer = new Renderer(global.canvas!, context);
@@ -65,15 +67,20 @@
       const delta = time - last;
       last = time;
 
-      world.process(renderer, delta);
+      renderer.delta = delta;
+      renderer.context.save();
+      world.process(global, delta);
       world.draw(renderer);
+      renderer.context.restore();
     }
 
     requestAnimationFrame(frame);
   });
+
+  export { global };
 </script>
 
-<svelte:window {onkeydown}></svelte:window>
+<svelte:window {onkeydown} {onkeyup} {onwheel}></svelte:window>
 
 <canvas
   bind:this={global.canvas}
@@ -85,3 +92,5 @@
   class="absolute w-screen h-screen bg-[#F2FBFF] cursor-crosshair"
 >
 </canvas>
+
+<Overlay></Overlay>
