@@ -12,6 +12,7 @@ export class Blob implements Drawable {
   color: string;
   speed: number;
   name?: string; //? kinda mostly the same as | undefined
+  //leader?: boolean;
 
   constructor(x: number, y: number, radius: number, color: string, speed: number, name?: string) {
     this.x = x;
@@ -22,6 +23,7 @@ export class Blob implements Drawable {
     this.color = color;
     this.speed = speed;
     this.name = name;
+    //this.leader = leader;
   }
 
   static random(): Blob {
@@ -66,5 +68,18 @@ export class Blob implements Drawable {
     const dy = py - this.y;
     const distanceSquared = dx * dx + dy * dy;
     return distanceSquared <= this.radius * this.radius;
+  }
+
+  //TODO: fix it all, wrong, the x and y moves with every clone to the +50 thing,
+  // maybe add an varuable for that newx and newy, ot maybe have a leader blob what positionm stays
+  // and for the clones the positiob jumps to +50 wahatever, idk
+  clone(): Blob {
+    const x = this.x;
+    const y = this.y;
+    //its moving the blob from the original position, baaaaaaaaaaaad
+    const jx = x - ((x - 50) * 0.3);
+    const jy = y - ((y - 50) * 0.3);
+
+    return new Blob(jx, jy, this.radius, this.color, this.speed, this.name);
   }
 }

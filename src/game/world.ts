@@ -12,7 +12,7 @@ export class World implements Drawable {
     this.players = [];
     this.size = size;
     //_ - this weird thing is default value for the thing i need no care about
-    this.foods = Array.from({ length: 50 }, () => {
+    this.foods = Array.from({ length: 500 }, () => {
       return Blob.random();
     });
   }
@@ -46,6 +46,7 @@ export class World implements Drawable {
     }
 
     for (const player of this.players) {
+      player.collision();
       player.draw(renderer);
     }
   }

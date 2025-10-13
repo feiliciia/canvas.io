@@ -28,6 +28,16 @@
     requestAnimationFrame(frame);
   });
 
+  // window.addEventListener("keydown", (e) => {
+  //   if (e.code === "Space") {
+  //     try {
+  //       player.split();
+  //     } catch (err) {
+  //       console.error("Error during split:", err);
+  //     }
+  //   }
+  // });
+
   function frame(time: number) {
     requestAnimationFrame(frame);
 
@@ -36,6 +46,8 @@
     timeLast = time;
 
     for (const blob of player.blobs) {
+      const minDist = blob.radius + 10;
+
       blob.calculateVelocity(renderer, x, y);
 
       //speed gets down when its bigger size
@@ -46,6 +58,12 @@
       // map borders
       blob.x = clamp(blob.x, -MAP_SIZE / 2, MAP_SIZE / 2);
       blob.y = clamp(blob.y, -MAP_SIZE / 2, MAP_SIZE / 2);
+
+      // blob.x = clamp(blob.x, -minDist, minDist);
+      // blob.y = clamp(blob.y, -minDist, minDist);
+      // export function clamp(value: number, min: number, max: number): number {
+      //   return Math.min(Math.max(value, min), max);
+      // }
     }
 
     world.cannibalism();
@@ -55,13 +73,19 @@
     world.draw(renderer);
   }
 
+  function keyDown(e: KeyboardEvent) {
+    if (e.key == " ") {
+      player.split();
+    }
+  }
+
   function onmousemove(event: MouseEvent) {
     x = event.x - 0.5 * renderer.width;
     y = event.y - 0.5 * renderer.height;
   }
 </script>
 
-<svelte:window {onmousemove}></svelte:window>
+<svelte:window {onmousemove} onkeydown={keyDown}></svelte:window>
 
 <div class="absolute z-1">
   {x},

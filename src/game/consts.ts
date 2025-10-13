@@ -10,4 +10,4 @@ export const colors: string[] = [
   "#2ECC71", // fresh green
   "#3498DB", // sky blue
 ];
-export const MAP_SIZE = 1000;
+export const MAP_SIZE = 5000;
