@@ -42,7 +42,4 @@
       {/if}
     </button>
   </div>
-  <div class="absolute m-4 bg-black/40 flex p-4 gap-2">
-    <span class="font-bold">Zoom: {(global.renderer?.camera.zoom ?? 1).toFixed(2)}x</span>
-  </div>
 </div>

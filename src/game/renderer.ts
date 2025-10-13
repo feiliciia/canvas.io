@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import { Camera } from "./camera.svelte.ts";
+import { Camera } from "./camera.ts";
 
 export class Renderer {
   // where is our camera?

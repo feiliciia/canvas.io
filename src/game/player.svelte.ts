@@ -56,7 +56,7 @@ export class Player {
       for (const cellB of this.cells.slice(1)) {
         const MIN_V = 0.5;
 
-        const canMerge = cellA.canMerge && cellB.canMerge;
+        const canMerge = cellA.canMerge() && cellB.canMerge();
         const launched = Math.abs(cellA.vx) > MIN_V || Math.abs(cellA.vy) > MIN_V || Math.abs(cellB.vx) > MIN_V || Math.abs(cellB.vy) > MIN_V;
 
         // we don't want to apply collision if cells can merge or if they're being launched out

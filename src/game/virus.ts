@@ -16,7 +16,7 @@ export class Virus extends Cell {
   static random(size: number): Virus {
     const x = -(size / 2) + Math.random() * size;
     const y = -(size / 2) + Math.random() * size;
-    return new Virus(x, y, 8192);
+    return new Virus(x, y, 6000);
   }
 
   override draw(renderer: Renderer): void {

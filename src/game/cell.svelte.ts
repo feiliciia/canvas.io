@@ -35,10 +35,6 @@ export class Cell implements Drawable {
     return massToRadius(this.mass);
   }
 
-  get canMerge(): boolean {
-    return this.mergeTimer === 0;
-  }
-
   constructor(x: number, y: number, mass: number, texture: Texture, name?: string) {
     this.tx = 0;
     this.ty = 0;
@@ -96,6 +92,10 @@ export class Cell implements Drawable {
     }
   }
 
+  canMerge(): boolean {
+    return this.mergeTimer === 0;
+  }
+
   draw(renderer: Renderer): void {
     const ctx = renderer.context;
 
@@ -148,12 +148,22 @@ export class Cell implements Drawable {
     ctx.fill();
   }
 
-  isVisible(renderer: Renderer) {
-    const { width, height, camera } = renderer;
+  // FIXME: make it even faster, this is called for all cells every frame
+  visible(renderer: Renderer) {
+    const halfW = renderer.width / 2;
+    const halfH = renderer.height / 2;
 
-    return camera.x - this.x + this.radius > -width * (1 / camera.zoom) &&
-      camera.x - this.x - this.radius < width * (1 / camera.zoom) &&
-      camera.y - this.y + this.radius > -height * (1 / camera.zoom) &&
-      camera.y - this.y - this.radius < height * (1 / camera.zoom);
+    const relativeX = renderer.camera.x - this.x;
+    const relativeY = renderer.camera.y - this.y;
+
+    if (Math.abs(relativeX) > this.radius + halfW * renderer.camera.inverseZoom) {
+      return false;
+    }
+
+    if (Math.abs(relativeY) > this.radius + halfH * renderer.camera.inverseZoom) {
+      return false;
+    }
+
+    return true;
   }
 }

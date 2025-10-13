@@ -55,7 +55,7 @@ export class World implements Drawable {
         }
 
         if (cellA.owner === cellB.owner) {
-          if (cellA.canMerge && cellB.canMerge) {
+          if (cellA.canMerge() && cellB.canMerge()) {
             if (cellA.canEat(cellB)) {
               cellA.mass += cellB.mass;
               cellB.owner!.removeCell(cellB);
@@ -113,23 +113,20 @@ export class World implements Drawable {
   }
 
   draw(renderer: Renderer): void {
-    const { context, camera } = renderer;
+    const { camera } = renderer;
 
-    const factor = Math.max(2 / camera.zoom, 1) - 1;
-    const hw = renderer.width / 2;
-    const hh = renderer.height / 2;
+    const halfW = renderer.width / 2;
+    const halfH = renderer.height / 2;
 
-    const sx = -factor * hw;
-    const sy = -factor * hh;
-    const ex = renderer.width * (1 + factor);
-    const ey = renderer.height * (1 + factor);
-
-    context.clearRect(sx, sy, ex, ey);
+    const sx = camera.zoom > 1.0 ? 0 : -halfW * (camera.inverseZoom - 1);
+    const sy = camera.zoom > 1.0 ? 0 : -halfH * (camera.inverseZoom - 1);
+    const ex = camera.zoom > 1.0 ? renderer.width : renderer.width * camera.inverseZoom;
+    const ey = camera.zoom > 1.0 ? renderer.height : renderer.height * camera.inverseZoom;
 
     this.drawGrid(renderer, sx, sy, ex, ey);
 
     const foods = this.foods
-      .filter((food) => food.isVisible(renderer));
+      .filter((food) => food.visible(renderer));
 
     for (const food of foods) {
       food.draw(renderer);
@@ -139,7 +136,7 @@ export class World implements Drawable {
       .flatMap((player) => player.cells)
       .concat(this.viruses)
       .toSorted((a, b) => a.mass - b.mass)
-      .filter((cell) => cell.isVisible(renderer));
+      .filter((cell) => cell.visible(renderer));
 
     for (const cell of cells) {
       cell.draw(renderer);
@@ -159,7 +156,7 @@ export class World implements Drawable {
 
   // deno-lint-ignore require-await
   async spawnPlayer(): Promise<Player> {
-    const player = new Player(this, 0, 0, 2000, textureColor(randomColor()), "Peter", 16);
+    const player = new Player(this, 0, 0, 20000, textureColor(randomColor()), "Peter", 16);
     player.alive = true;
     this.players.push(player);
     return player;

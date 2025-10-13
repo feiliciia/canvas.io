@@ -70,6 +70,7 @@
 
       renderer.delta = delta;
       renderer.context.save();
+      renderer.context.clearRect(0, 0, renderer.width, renderer.height);
       world.process(global, delta);
       world.draw(renderer);
       renderer.context.restore();
