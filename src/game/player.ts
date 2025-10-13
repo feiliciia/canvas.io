@@ -74,8 +74,8 @@ export class Player implements Drawable {
           //this.blobs[j].y = minDist-this.blobs[j].y
 
           //vectors using, so can see the dirrectory and not jumping - separating😀
-          const nx = distX * (minDist - dist) / dist;
-          const ny = distY * (minDist - dist) / dist;
+          const nx = distX * (minDist - dist) / (dist * 2);
+          const ny = distY * (minDist - dist) / (dist * 2);
 
           this.blobs[j].x += nx;
           this.blobs[j].y += ny;
