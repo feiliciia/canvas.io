@@ -2,4 +2,5 @@
 
 :root {
   @apply select-none;
+  @apply leading-none;
 }

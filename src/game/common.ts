@@ -1,4 +1,14 @@
-import type { Color, Image } from "./game.ts";
+import { Renderer } from "./renderer.ts";
+
+export type Color = { kind: "color"; hex: string };
+export type Image = { kind: "image"; src: string };
+
+// blobs can have a solid color or an image
+export type Texture = Color | Image;
+
+export interface Drawable {
+  draw(renderer: Renderer): void;
+}
 
 const colors: string[] = [
   "#FF5733", // bright orange-red🚗🚗🚗🚗🚗

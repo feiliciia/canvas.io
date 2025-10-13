@@ -1,52 +1,63 @@
+<script module lang="ts">
+  export type Global = {
+    width: number;
+    height: number;
+    canvas?: HTMLCanvasElement;
+    renderer?: Renderer;
+    world?: World;
+    localPlayer?: Player;
+  };
+</script>
+
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Game, Player, Renderer } from "../game";
-  import { clamp, randomColor, textureColor } from "../util";
+  import { World } from "../game/world.svelte";
+  import { Renderer } from "../game/renderer";
+  import { Player } from "../game/player";
 
-  let canvas: HTMLCanvasElement | undefined = $state();
-  let game: Game | undefined = $state();
+  let global: Global = $state({
+    width: 0,
+    height: 0,
+  });
 
-  let width = $state(0);
-  let height = $state(0);
-  let limit = $derived(Math.min(width, height));
+  export { global };
 
-  export { game, height, width };
-
-  export function onmousemove(event: MouseEvent) {
-    if (!game) {
+  function onmousemove(event: MouseEvent) {
+    if (!global.renderer || !global.world || !global.localPlayer) {
       return;
     }
 
-    const x = event.x - 0.5 * width;
-    const y = event.y - 0.5 * height;
+    let { width, height, canvas, localPlayer } = global;
 
-    const relativeBlobX = x;
-    const relativeBlobY = y;
-
-    const distanceMax = 0.25 * limit;
-    const distanceFromCenter = Math.hypot(relativeBlobX, relativeBlobY);
-    const distanceToMaxRatio = distanceMax / Math.max(distanceFromCenter, 0.00001);
-    const distance = clamp(distanceFromCenter, 0, distanceMax);
-
-    const vx = relativeBlobX * distanceToMaxRatio * distance / (distanceMax * distanceMax);
-    const vy = relativeBlobY * distanceToMaxRatio * distance / (distanceMax * distanceMax);
-
-    for (const part of game!.localPlayer.parts) {
-      part.vx = vx;
-      part.vy = vy;
+    for (const cell of localPlayer.cells) {
+      cell.tx = canvas!.clientLeft + event.x - 0.5 * width;
+      cell.ty = canvas!.clientTop + event.y - 0.5 * height;
     }
   }
 
-  onMount(() => {
-    // initialize the renderer
-    const context = canvas!.getContext("2d")!;
-    const renderer = new Renderer(context, width, height);
+  function onkeydown(event: KeyboardEvent) {
+    if (!global.renderer || !global.world || !global.localPlayer) {
+      return;
+    }
 
-    // TODO: in the future, load the game from server
-    const localPlayer = new Player(0, 0, 2000, textureColor(randomColor()), "Peter");
-    game = new Game(renderer, localPlayer);
+    switch (event.code) {
+      case "Space":
+        global.localPlayer.split();
+        break;
+    }
+  }
 
+  onMount(async () => {
+    const context = global.canvas!.getContext("2d")!;
+
+    global.renderer = new Renderer(global.canvas!, context);
+    global.world = await World.loadFromServer();
+
+    let { renderer, world } = global;
     let last = 0;
+
+    global.localPlayer = await world.spawnPlayer();
+    renderer.camera.target = global.localPlayer;
 
     function frame(time: number) {
       requestAnimationFrame(frame);
@@ -54,17 +65,23 @@
       const delta = time - last;
       last = time;
 
-      game!.process(delta);
-      game!.world.draw(game!.renderer);
+      world.process(renderer, delta);
+      world.draw(renderer);
     }
-
-    $effect(() => {
-      game!.renderer.width = width;
-      game!.renderer.height = height;
-    });
 
     requestAnimationFrame(frame);
   });
 </script>
 
-<canvas bind:this={canvas} bind:clientWidth={width} bind:clientHeight={height} {width} {height} class="absolute w-screen h-screen bg-[#F2FBFF]"></canvas>
+<svelte:window {onkeydown}></svelte:window>
+
+<canvas
+  bind:this={global.canvas}
+  bind:clientWidth={global.width}
+  bind:clientHeight={global.height}
+  width={global.width}
+  height={global.height}
+  {onmousemove}
+  class="absolute w-screen h-screen bg-[#F2FBFF] cursor-crosshair"
+>
+</canvas>
