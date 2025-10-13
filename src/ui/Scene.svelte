@@ -40,6 +40,7 @@
   }
 
   function onwheel(event: WheelEvent) {
+    event.preventDefault();
     global.renderer?.camera.onWheel(clamp(event.deltaY, -1, 1));
   }
 
@@ -90,6 +91,7 @@
   height={global.height}
   {onmousemove}
   class="absolute w-screen h-screen bg-[#F2FBFF] cursor-crosshair"
+  oncontextmenu={(event: MouseEvent) => event.preventDefault()}
 >
 </canvas>
 

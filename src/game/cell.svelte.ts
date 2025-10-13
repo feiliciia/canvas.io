@@ -151,9 +151,9 @@ export class Cell implements Drawable {
   isVisible(renderer: Renderer) {
     const { width, height, camera } = renderer;
 
-    return camera.x - this.x > -width * (1 / camera.zoom) &&
-      camera.x - this.x < width * (1 / camera.zoom) &&
-      camera.y - this.y > -height * (1 / camera.zoom) &&
-      camera.y - this.y < height * (1 / camera.zoom);
+    return camera.x - this.x + this.radius > -width * (1 / camera.zoom) &&
+      camera.x - this.x - this.radius < width * (1 / camera.zoom) &&
+      camera.y - this.y + this.radius > -height * (1 / camera.zoom) &&
+      camera.y - this.y - this.radius < height * (1 / camera.zoom);
   }
 }

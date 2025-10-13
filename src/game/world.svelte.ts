@@ -128,11 +128,20 @@ export class World implements Drawable {
 
     this.drawGrid(renderer, sx, sy, ex, ey);
 
-    for (const food of this.foods.filter((food) => food.isVisible(renderer))) {
+    const foods = this.foods
+      .filter((food) => food.isVisible(renderer));
+
+    for (const food of foods) {
       food.draw(renderer);
     }
 
-    for (const cell of this.players.flatMap((player) => player.cells).concat(this.viruses).toSorted((a, b) => a.mass - b.mass)) {
+    const cells = this.players
+      .flatMap((player) => player.cells)
+      .concat(this.viruses)
+      .toSorted((a, b) => a.mass - b.mass)
+      .filter((cell) => cell.isVisible(renderer));
+
+    for (const cell of cells) {
       cell.draw(renderer);
     }
   }
