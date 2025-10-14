@@ -14,7 +14,7 @@ export const enum GameEvent {
   Kill,
 }
 
-export type GameEventArgs = {
+export type GameEventMap = {
   [GameEvent.Join]: [[player: Player], void];
   [GameEvent.Kill]: [[killer: Player, killed: Player], void];
 };
@@ -61,7 +61,7 @@ export class Game {
   public readonly input: Input;
   public readonly camera: Camera;
 
-  public events: EventManager<GameEvent, GameEventArgs>;
+  public events: EventManager<GameEvent, GameEventMap>;
 
   public renderer?: Renderer;
   public world?: World;

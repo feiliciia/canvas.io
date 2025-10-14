@@ -16,7 +16,7 @@ export const enum PlayerAction {
   // Quit the game
   //  note: a player is not responsible for spawning itself - it's the server's responsibility
   Quit,
-}
+} 
 
 type ActionArguments = {
   [PlayerAction.Target]: {

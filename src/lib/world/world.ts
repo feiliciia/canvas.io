@@ -64,6 +64,7 @@ export class World implements IDrawable {
   public foods: Food[];
   public viruses: Virus[];
   public players: Player[];
+
   public localPlayer?: Player;
 
   public constructor(config: WorldConfig) {

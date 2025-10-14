@@ -57,8 +57,4 @@ export class Virus extends Cell {
     context.fill();
     context.stroke();
   }
-
-  public override visible(camera: Camera): boolean {
-    return super.visible(camera);
-  }
 }

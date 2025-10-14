@@ -6,6 +6,7 @@
   import { PlayerAction } from "$lib/world/player";
   import { game } from "$lib/game.svelte";
   import { mode } from "mode-watcher";
+    import { Center } from "$lib/view/camera";
 
   let overlay: Overlay | undefined = $state();
   let canvas: HTMLCanvasElement | undefined = $state();
@@ -29,13 +30,6 @@
 
     game.world!.localPlayer = await game.spawnPlayer();
     game.camera.target = game.world!.localPlayer!;
-
-    // lisa: uncomment this !!! :D Lol
-    // let i = 0;
-    // setInterval(() => {
-    //   game.camera.target = i % 2 === 0 ? game.world!.localPlayer! : new Center();
-    //   i += 1;
-    // }, 2000);
 
     setInterval(async () => {
       if (game.world!.players.length >= 500 || game.world!.players.filter((player) => player.alive).length >= 50) {
@@ -72,7 +66,7 @@
       // TODO: eject a small piece out of all eligible cells!
     });
 
-    const TPS: number = 144;
+    const TPS: number = 4;
 
     setInterval(() => {
       game.world!.update(1000 / TPS);

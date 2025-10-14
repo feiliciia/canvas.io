@@ -5,6 +5,7 @@ export type Image = { kind: "image"; src: string };
 // blobs can have a solid color or an image
 export type Texture = Color | Image;
 
+// deno-lint-ignore no-unused-vars
 const colors: Hsl[] = [
   [10.588, 1.000, 0.600],
   [229.412, 1.000, 0.600],
@@ -160,7 +161,6 @@ export function randomColor(): Hsl {
 
 export class Animated<T> {
   #current: T;
-
   public get current() {
     return this.#current;
   }
@@ -201,18 +201,24 @@ export class TypedMap<K0 extends Key, M extends Record<K0, unknown>> extends Map
   }
 }
 
-type Event = Key;
-type ArgsMap<E extends Event> = Record<E, [unknown[], unknown]>;
+type Exact<A, B> = A extends B ? (B extends A ? A : never) : never;
+type Event = number | string | symbol;
+type SignatureMap<E extends Event> = Record<E, [unknown[], unknown]>;
+type Callback<E extends Event, M extends SignatureMap<E>> = (...args: M[E][0]) => M[E][1];
 
-export type Args<E extends Event, M extends ArgsMap<E>> = [[...M[E][0]], M[E][1]];
-export type Callback<E extends Event, M extends ArgsMap<E>> = (...args: Args<E, M>[0]) => Args<E, M>[1];
+export class EventManager<E extends Event, M extends SignatureMap<E>> {
+  private callbacks: Map<E, Callback<E, M>>;
 
-export class EventManager<E extends Event, M extends ArgsMap<E>> extends Map<E, Callback<E, M>> {
-  public on<EV extends E>(event: EV, callback: Callback<EV, M>): this {
-    return this.set(event, callback);
+  public constructor() {
+    this.callbacks = new Map();
   }
 
-  public emit<EV extends E>(event: EV, ...args: Args<EV, M>[0]): Args<EV, M>[1] | undefined {
-    return this.get(event)?.(...args);
+  public on<EV extends E, F>(event: EV, callback: Exact<F, Callback<EV, M>>): this {
+    this.callbacks.set(event, callback);
+    return this;
+  }
+
+  public emit<EV extends E>(event: EV, ...args: M[EV][0]): M[EV][1] | undefined {
+    return this.callbacks.get(event)?.(...args);
   }
 }
