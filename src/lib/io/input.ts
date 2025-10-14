@@ -1,5 +1,5 @@
 import { game } from "../game.svelte.ts";
-import { clamp } from "../utilities.ts";
+import { clamp, TypedMap } from "../utilities.ts";
 
 export type KeyboardCallback = (event: KeyboardEvent) => void;
 export type InputCallback = () => void;
@@ -20,21 +20,8 @@ type InputCallbacks = {
   [InputEvent.Split]: () => void;
 };
 
-type Callback<E extends InputEvent> = InputCallbacks[E];
-
-// deno-lint-ignore no-unused-vars
-class CallbackMap extends Map<InputEvent, InputCallbacks[InputEvent]> {
-  override get<E extends InputEvent>(event: E): InputCallbacks[E] | undefined {
-    return super.get(event) as InputCallbacks[E] | undefined;
-  }
-
-  override set<E extends InputEvent>(event: E, callback: InputCallbacks[E]): this {
-    return super.set(event, callback);
-  }
-}
-
 export class Input {
-  private callbacks: CallbackMap;
+  private callbacks: TypedMap<InputEvent, InputCallbacks>;
   private keystates: Map<KeyCode, boolean>;
   private keybinds: Map<KeyCode, InputEvent>;
 
@@ -105,7 +92,7 @@ export class Input {
     this.keystates.set(e.code, false);
   }
 
-  public on<E extends InputEvent>(event: E, callback: Callback<E>) {
+  public on<E extends InputEvent>(event: E, callback: InputCallbacks[E]) {
     this.callbacks.set(event, callback);
   }
 }

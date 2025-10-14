@@ -1,10 +1,10 @@
-import type { Renderer } from "../view/renderer.ts";
+import type { IDrawable, Renderer } from "../view/renderer.ts";
 import type { Camera } from "../view/camera.ts";
 import { Player } from "./player.ts";
 import { Food } from "./food.ts";
 import { Virus } from "./virus.ts";
 import { Sound } from "../io/audio.ts";
-import { game } from "../game.svelte.ts";
+import { game, GameEvent } from "../game.svelte.ts";
 import { clamp } from "../utilities.ts";
 
 export type WorldConfig = {
@@ -13,11 +13,6 @@ export type WorldConfig = {
   mergeCooldown: number;
   maxCellsPerPlayer: number;
 };
-
-export interface IDrawable {
-  draw(renderer: Renderer, camera: Camera): void;
-  visible(camera: Camera): boolean;
-}
 
 export class Grid implements IDrawable {
   public readonly size: number;
@@ -79,8 +74,6 @@ export class World implements IDrawable {
   }
 
   public update(delta: number) {
-    const renderer = game.renderer!;
-
     // move
     for (const player of this.players) {
       for (const cell of player.cells) {
@@ -107,7 +100,7 @@ export class World implements IDrawable {
       player.collision();
     }
 
-    // merge
+    // decrement merge timeout, eat food
     for (const cell of this.players.flatMap((player) => player.cells)) {
       cell.mergeTimeout = Math.max(cell.mergeTimeout - delta / 1000, 0);
 
@@ -125,13 +118,14 @@ export class World implements IDrawable {
 
     const cells = this.players.flatMap((player) => player.cells).toSorted((a, b) => a.mass - b.mass);
 
-    // eat
+    // eat other cells
     for (const cellA of cells) {
       for (const cellB of cells) {
         if (cellA === cellB) {
           continue;
         }
 
+        // cells of the same parent, could be written better
         if (cellA.parent === cellB.parent) {
           if (cellA.canMerge && cellB.canMerge) {
             if (cellA.canEat(cellB)) {
@@ -143,18 +137,29 @@ export class World implements IDrawable {
             }
           }
         } else {
+          // different parents, we know they exist because every cell from `cells` comes from players
           if (cellA.canEat(cellB)) {
+            const parentA = cellA.parent!;
+            const parentB = cellB.parent!;
+
             cellA.mass += cellB.mass;
-            cellB.parent!.removeCell(cellB);
+            parentB.removeCell(cellB);
+
+            if (!parentB.alive) {
+              game.events.emit(GameEvent.Kill, parentA, parentB);
+              if (game.camera.target === parentA) {
+                game.audio.play(Sound.Kill);
+              }
+            }
           }
         }
       }
     }
-
-    game.camera.update(renderer);
   }
 
   public draw(renderer: Renderer, camera: Camera) {
+    camera.update(renderer);
+
     this.grid.draw(renderer, camera);
 
     this.foods

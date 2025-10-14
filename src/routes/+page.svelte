@@ -1,14 +1,13 @@
 <script lang="ts">
-  import Overlay from "../lib/ui/Overlay.svelte";
-  import { InputEvent } from "../lib/io/input";
   import { onMount } from "svelte";
-  import { game } from "../lib/game.svelte";
-  import { World } from "../lib/world/world";
-  import { Renderer } from "../lib/view/renderer";
-  import { Sound } from "$lib/io/audio";
-  import { Center } from "$lib/view/camera";
-  import { PlayerAction } from "$lib/world/player";
 
+  import Overlay from "$lib/ui/Overlay.svelte";
+  import { InputEvent } from "$lib/io/input";
+  import { Renderer } from "$lib/view/renderer";
+  import { PlayerAction } from "$lib/world/player";
+  import { game } from "$lib/game.svelte";
+
+  let overlay: Overlay | undefined = $state();
   let canvas: HTMLCanvasElement | undefined = $state();
   let width = $state(0);
   let height = $state(0);
@@ -39,7 +38,7 @@
     // }, 2000);
 
     const interval = setInterval(async () => {
-      if (game.world!.players.length === 10) {
+      if (game.world!.players.length === 50) {
         clearInterval(interval);
       }
 
@@ -55,11 +54,8 @@
       setInterval(() => {
         player?.action(PlayerAction.Split, undefined);
       }, 3000 + Math.random() * 7000);
-    }, 1000 + Math.random() * 3000);
+    }, 50);
 
-    // FIXME: rebrand tx/ty!
-    // x and y should be relative to the world
-    // i.e. where the mouse currently is in world spacTarget
     game.input.on(InputEvent.Target, (x: number, y: number) => {
       game.world?.localPlayer?.action(PlayerAction.Target, { x, y });
     });
@@ -68,7 +64,6 @@
       game.camera.updateZoom(delta);
     });
 
-    // FIXME: sound should play based on PlayerAction and not InputEvent
     game.input.on(InputEvent.Split, () => {
       game.world?.localPlayer?.action(PlayerAction.Split, undefined);
     });
@@ -77,11 +72,10 @@
       // TODO: eject a small piece out of all eligible cells!
     });
 
-    /* was testing independent updates... it went wrong... :(
     setInterval(() => {
-      game.world!.update(1000 / 60);
-    }, 1000 / 60);
-    */
+      game.world!.update(1000 / 90);
+      overlay?.update(game.world!);
+    }, 1000 / 90);
 
     requestAnimationFrame(game.renderer.frame.bind(game.renderer));
   });
@@ -94,7 +88,7 @@
   {onbeforeunload}
 ></svelte:window>
 
-<Overlay></Overlay>
+<Overlay bind:this={overlay}></Overlay>
 
 <canvas
   bind:this={canvas}

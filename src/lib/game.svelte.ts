@@ -7,7 +7,17 @@ import { Camera } from "./view/camera.ts";
 import { Food } from "./world/food.ts";
 import { Virus } from "./world/virus.ts";
 import { Player } from "./world/player.ts";
-import { randomColor, textureColor } from "./utilities.ts";
+import { EventManager, randomColor, randomName, textureColor } from "./utilities.ts";
+
+export const enum GameEvent {
+  Join,
+  Kill,
+}
+
+export type GameEventArgs = {
+  [GameEvent.Join]: [[player: Player], void];
+  [GameEvent.Kill]: [[killer: Player, killed: Player], void];
+};
 
 export class Settings {
   public muted: boolean;
@@ -50,6 +60,9 @@ export class Game {
   public readonly audio: Audio;
   public readonly input: Input;
   public readonly camera: Camera;
+
+  public events: EventManager<GameEvent, GameEventArgs>;
+
   public renderer?: Renderer;
   public world?: World;
 
@@ -58,6 +71,7 @@ export class Game {
     this.audio = new Audio();
     this.input = new Input();
     this.camera = new Camera();
+    this.events = new EventManager();
   }
 
   // simulate loading the world from a server
@@ -89,8 +103,11 @@ export class Game {
     const y = -size / 2 + Math.random() * size;
     const mass = 1000 + Math.random() * 10000;
 
-    const player = new Player(this.world, x, y, mass, textureColor(randomColor()), "Peter");
+    const player = new Player(this.world, x, y, mass, textureColor(randomColor()), randomName());
+
     this.world.players.push(player);
+    this.events.emit(GameEvent.Join, player);
+
     return player;
   }
 }

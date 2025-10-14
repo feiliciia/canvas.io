@@ -4,6 +4,11 @@ import { game } from "../game.svelte.ts";
 import type { World } from "../world/world.ts";
 import type { Camera } from "./camera.ts";
 
+export interface IDrawable {
+  draw(renderer: Renderer, camera: Camera): void;
+  visible(camera: Camera): boolean;
+}
+
 export class Renderer {
   private last: number;
   public delta: number;
@@ -34,7 +39,6 @@ export class Renderer {
   public render(world: World, camera: Camera) {
     this.context.save();
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    world.update(this.delta);
     world.draw(this, camera);
     this.context.restore();
   }

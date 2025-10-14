@@ -1,10 +1,10 @@
 import type { Texture } from "../utilities.ts";
 import type { ITarget } from "../view/camera.ts";
-import type { IDrawable } from "./world.ts";
-import { Cell } from "./cell.ts";
-import { World } from "./world.ts";
-import { game } from "../game.svelte.ts";
+import type { IDrawable } from "../view/renderer.ts";
+import type { World } from "./world.ts";
 import { Sound } from "../io/audio.ts";
+import { Cell } from "./cell.ts";
+import { game } from "../game.svelte.ts";
 
 export const enum PlayerAction {
   // Target a point in world
@@ -35,6 +35,10 @@ export class Player implements IDrawable, ITarget {
   private world: World;
   public cells: Cell[];
   public name: string;
+
+  public get alive(): boolean {
+    return this.cells.length > 0;
+  }
 
   public constructor(world: World, x: number, y: number, mass: number, texture: Texture, name: string) {
     const cell = new Cell(x, y, mass, texture, name);

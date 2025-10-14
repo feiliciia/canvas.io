@@ -4,6 +4,7 @@ export const enum Sound {
   Split,
   Eat,
   Merge,
+  Kill,
 }
 
 const sounds: Map<Sound, string[]> = new Map([
@@ -25,6 +26,9 @@ const sounds: Map<Sound, string[]> = new Map([
     "/sounds/merge2.ogg",
     "/sounds/merge3.ogg",
     "/sounds/merge4.ogg",
+  ]],
+  [Sound.Kill, [
+    "/sounds/kill1.ogg",
   ]],
 ]);
 

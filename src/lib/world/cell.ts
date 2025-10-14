@@ -1,8 +1,7 @@
 import type { Texture } from "../utilities.ts";
 import type { Player } from "./player.ts";
-import type { Renderer } from "../view/renderer.ts";
+import type { IDrawable, Renderer } from "../view/renderer.ts";
 import type { Camera } from "../view/camera.ts";
-import type { IDrawable } from "./world.ts";
 import { clamp, massToRadius } from "../utilities.ts";
 
 // FIXME: rework this entire class pls! :D
@@ -176,6 +175,17 @@ export class Cell implements IDrawable {
 
     context.stroke();
     context.fill();
+
+    if (this.name) {
+      context.lineWidth = Math.max(~~(this.radius * 0.01), 0.7);
+      context.fillStyle = "#FFFFFF";
+      context.strokeStyle = "black";
+      context.font = `bolder ${~~(this.radius * 0.6)}px Calibri`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(this.name, ox + this.x, oy + this.y);
+      context.strokeText(this.name, ox + this.x, oy + this.y);
+    }
   }
 
   // FIXME: make it even faster; this is called for all cells every frame
