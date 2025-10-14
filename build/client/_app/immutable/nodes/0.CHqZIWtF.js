@@ -1,0 +1,1 @@
+import"../chunks/DsnmJJEf.js";import{i as n,j as s,k as r,s as i,l,$ as c,n as p}from"../chunks/C1qe4ae1.js";const m=!1,u=!0,$=Object.freeze(Object.defineProperty({__proto__:null,csr:u,ssr:m},Symbol.toStringTag,{value:"Module"}));function h(e,t){var o=n();s(d=>{c.title="lisa.io"});var a=r(o);i(a,()=>t.children??p),l(e,o)}export{h as component,$ as universal};

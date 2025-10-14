@@ -16,7 +16,7 @@
     "@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^6.2.1",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.14",
     "lucide-svelte": "npm:lucide-svelte@^0.545.0",
-    "svelte": "npm:svelte@^5.39.11",
+    "svelte": "npm:svelte@^5.39.12",
     "tailwindcss": "npm:tailwindcss@^4.1.14",
     "vite": "npm:vite@^7.1.9"
   },
