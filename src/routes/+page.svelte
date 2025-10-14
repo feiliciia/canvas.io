@@ -28,16 +28,6 @@
     requestAnimationFrame(frame);
   });
 
-  // window.addEventListener("keydown", (e) => {
-  //   if (e.code === "Space") {
-  //     try {
-  //       player.split();
-  //     } catch (err) {
-  //       console.error("Error during split:", err);
-  //     }
-  //   }
-  // });
-
   function frame(time: number) {
     requestAnimationFrame(frame);
 
@@ -46,8 +36,6 @@
     timeLast = time;
 
     for (const blob of player.blobs) {
-      const minDist = blob.radius + 10;
-
       blob.calculateVelocity(renderer, x, y);
 
       //speed gets down when its bigger size

@@ -74,8 +74,8 @@ export class Player implements Drawable {
           //this.blobs[j].y = minDist-this.blobs[j].y
 
           //vectors using, so can see the dirrectory and not jumping - separating😀
-          const nx = distX * (minDist - dist) / (dist * 2);
-          const ny = distY * (minDist - dist) / (dist * 2);
+          const nx = distX * (minDist - dist) / Math.max(dist * 4, 0.0001);
+          const ny = distY * (minDist - dist) / Math.max(dist * 4, 0.0001);
 
           this.blobs[j].x += nx;
           this.blobs[j].y += ny;
@@ -86,20 +86,4 @@ export class Player implements Drawable {
       }
     }
   }
-
-  //TODO: do the border for the blobs, not sure if here or in the blob/player
-  //do it with 2 for loops like:
-  //for(){
-  //  for(){
-  //    const mindist = blob.radious+10?
-  //      distx = blobB.x - blobA.x
-  //      disty = blobB.y - blobA.y
-  //      Math.hoypot(distx,disty);
-  //      if(dist<=mindist){
-  //        blobB.x=mindist-blobB.x
-  //        blobB.y=mindist-blobB.y
-  //      }
-  //     }
-  //  }
-  //idk something like this, but can maybe use clamp for that????but how. put the function in a clamp and then use it, but where.
 }
