@@ -154,7 +154,8 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 export function randomColor(): Hsl {
-  return colors[~~(Math.random() * colors.length)];
+  //return colors[~~(Math.random() * colors.length)];
+  return [Math.random() * 360.0, 0.5 + Math.random() * 0.5, Math.random()];
 }
 
 export class Animated<T> {
