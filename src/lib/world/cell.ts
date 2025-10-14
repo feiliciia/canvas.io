@@ -11,8 +11,8 @@ export class Cell implements IDrawable {
     return this.#mass;
   }
   public set mass(mass: number) {
-    this.#mass = mass;
-    this.#radius = massToRadius(mass);
+    this.#mass = Math.min(mass, 100000);
+    this.#radius = massToRadius(this.#mass);
   }
 
   #radius: number;

@@ -5,6 +5,7 @@
   import { game, GameEvent } from "../game.svelte.ts";
   import { fade, fly } from "svelte/transition";
   import { derived, writable } from "svelte/store";
+  import { Camera } from "$lib/view/camera.ts";
 
   type Event =
     & { id: number }
@@ -14,6 +15,8 @@
     );
 
   let world = writable<World | undefined>();
+  let camera = writable<Camera | undefined>();
+
   let events: Event[] = $state([]);
 
   function pushEvent(event: Event) {
@@ -61,8 +64,9 @@
       }).slice(0, 10) ?? [];
   });
 
-  export function update(updated: World) {
-    world.set(updated);
+  export function update(updatedWorld: World, updatedCamera: Camera) {
+    world.set(updatedWorld);
+    camera.set(updatedCamera);
   }
 </script>
 
@@ -119,4 +123,10 @@
       </span>
     {/each}
   </div>
+  {#if $world?.localPlayer !== $camera?.target && $camera?.target.name}
+    <div class="absolute m-4 py-2 px-4 self-end justify-self-center flex gap-2 bg-black/40">
+      <span class="text-3xl font-semibold">Spectating</span>
+      <span class="text-3xl font-bold">{$camera.target.name}</span>
+    </div>
+  {/if}
 </div>

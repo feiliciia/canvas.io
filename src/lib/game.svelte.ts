@@ -79,14 +79,14 @@ export class Game {
   public async loadWorld() {
     const config: WorldConfig = {
       id: "fart",
-      size: 10000,
+      size: 2000,
       mergeCooldown: 10,
       maxCellsPerPlayer: 16,
     };
 
     const world = new World(config);
-    world.foods = Array.from({ length: 4096 }, () => Food.random(world));
-    world.viruses = Array.from({ length: 128 }, () => Virus.random(world));
+    world.foods = Array.from({ length: 256 }, () => Food.random(world));
+    world.viruses = Array.from({ length: 8 }, () => Virus.random(world));
     world.players = [];
 
     this.world = world;

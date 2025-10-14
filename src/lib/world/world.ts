@@ -1,5 +1,5 @@
 import type { IDrawable, Renderer } from "../view/renderer.ts";
-import type { Camera } from "../view/camera.ts";
+import { type Camera, Center } from "../view/camera.ts";
 import { Player } from "./player.ts";
 import { Food } from "./food.ts";
 import { Virus } from "./virus.ts";
@@ -147,8 +147,17 @@ export class World implements IDrawable {
 
             if (!parentB.alive) {
               game.events.emit(GameEvent.Kill, parentA, parentB);
+
               if (game.camera.target === parentA) {
                 game.audio.play(Sound.Kill);
+              } else if (game.camera.target === parentB) {
+                const alivePlayers = this.players.filter((player) => player.alive);
+                if (alivePlayers.length > 0) {
+                  game.camera.target = alivePlayers[~~(Math.random() * alivePlayers.length)];
+                } else {
+                  game.camera.target = new Center();
+                }
+                game.audio.play(Sound.Death);
               }
             }
           }

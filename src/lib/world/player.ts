@@ -58,7 +58,7 @@ export class Player implements IDrawable, ITarget {
     return false;
   }
 
-  public center(): [number, number] {
+  public get center(): [number, number] {
     if (this.cells.length === 0) {
       return [0, 0];
     }
@@ -69,7 +69,7 @@ export class Player implements IDrawable, ITarget {
     return [centerX, centerY];
   }
 
-  public size(): [number, number] {
+  public get size(): [number, number] {
     if (this.cells.length === 0) {
       return [256, 256];
     }

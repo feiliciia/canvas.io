@@ -4,16 +4,21 @@ import { clamp } from "../utilities.ts";
 import { game } from "../game.svelte.ts";
 
 export interface ITarget {
-  center(): [number, number];
-  size(): [number, number];
+  get name(): string | undefined;
+  get center(): [number, number];
+  get size(): [number, number];
 }
 
 export class Center implements ITarget {
-  public center(): [number, number] {
+  public get name(): string | undefined {
+    return undefined;
+  }
+
+  public get center(): [number, number] {
     return [0, 0];
   }
 
-  public size(): [number, number] {
+  public get size(): [number, number] {
     return [256, 256];
   }
 }
@@ -84,14 +89,15 @@ export class Camera {
   public update(renderer: Renderer) {
     this.alpha = 1 - Math.exp(-0.08 * game.renderer!.dt);
 
-    const [centerX, centerY] = this.target.center();
+    const [centerX, centerY] = this.target.center;
     this.x.set(centerX).tick();
     this.y.set(centerY).tick();
 
-    const [sizeX, sizeY] = this.target.size();
-    const ratioX = this.width / Math.max(sizeX, 128);
-    const ratioY = this.height / Math.max(sizeY, 128);
-    const ratio = clamp(Math.min(ratioX, ratioY) / 4, 0.125, 4);
+    const [sizeX, sizeY] = this.target.size;
+    const min = Math.min(this.width, this.height);
+    const max = Math.max(sizeX, sizeY);
+    const ratio = Math.min(min / max, 2);
+
     this.zoom.set(this.userZoom * ratio).tick();
 
     this.#zoomInverse = 1 / this.zoom.get();

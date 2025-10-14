@@ -37,9 +37,9 @@
     //   i += 1;
     // }, 2000);
 
-    const interval = setInterval(async () => {
-      if (game.world!.players.length === 50) {
-        clearInterval(interval);
+    setInterval(async () => {
+      if (game.world!.players.length >= 500 || game.world!.players.filter((player) => player.alive).length >= 50) {
+        return;
       }
 
       const player = await game.spawnPlayer();
@@ -49,11 +49,11 @@
         const x = -size / 2 + Math.random() * size;
         const y = -size / 2 + Math.random() * size;
         player?.action(PlayerAction.Target, { x, y });
-      }, 500 + Math.random() * 5000);
+      }, 100 + Math.random() * 1000);
 
       setInterval(() => {
         player?.action(PlayerAction.Split, undefined);
-      }, 3000 + Math.random() * 7000);
+      }, 1000 + Math.random() * 1000);
     }, 50);
 
     game.input.on(InputEvent.Target, (x: number, y: number) => {
@@ -72,10 +72,12 @@
       // TODO: eject a small piece out of all eligible cells!
     });
 
+    const TPS: number = 144;
+
     setInterval(() => {
-      game.world!.update(1000 / 90);
-      overlay?.update(game.world!);
-    }, 1000 / 90);
+      game.world!.update(1000 / TPS);
+      overlay?.update(game.world!, game.camera);
+    }, 1000 / TPS);
 
     requestAnimationFrame(game.renderer.frame.bind(game.renderer));
   });
