@@ -2,7 +2,7 @@ import type { Texture } from "../utilities.ts";
 import type { Player } from "./player.ts";
 import type { IDrawable, Renderer } from "../view/renderer.ts";
 import type { Camera } from "../view/camera.ts";
-import { clamp, massToRadius } from "../utilities.ts";
+import { massToRadius } from "../utilities.ts";
 
 // FIXME: rework this entire class pls! :D
 export class Cell implements IDrawable {
@@ -144,33 +144,35 @@ export class Cell implements IDrawable {
         break;
     }
 
-    const segments = clamp(this.radius, 16, 48);
     context.lineWidth = 4.0;
 
     context.beginPath();
-    for (let i = 0; i < segments; i++) {
-      const amp = 0.01;
-      const freq1 = 8;
-      const freq2 = 5;
-      const speed = 0;
-      const phase = 0;
+    context.arc(ox + this.x, oy + this.y, this.radius, 0, Math.PI * 2);
 
-      const a = (i / segments) * Math.PI * 2;
+    // const segments = clamp(this.radius, 16, 48);
+    // for (let i = 0; i < segments; i++) {
+    //   const amp = 0.01;
+    //   const freq1 = 8;
+    //   const freq2 = 5;
+    //   const speed = 0;
+    //   const phase = 0;
 
-      const n = Math.sin(freq1 * a + phase + renderer.delta * speed) * 0.6 +
-        Math.sin(freq2 * a - phase * 0.7 + renderer.delta * speed * 1.7) * 0.4;
+    //   const a = (i / segments) * Math.PI * 2;
 
-      const rw = Math.max(0.4, 1 + amp * n) * this.radius;
+    //   const n = Math.sin(freq1 * a + phase + renderer.delta * speed) * 0.6 +
+    //     Math.sin(freq2 * a - phase * 0.7 + renderer.delta * speed * 1.7) * 0.4;
 
-      const px = ox + this.x + Math.cos(a) * rw;
-      const py = oy + this.y + Math.sin(a) * rw;
+    //   const rw = Math.max(0.4, 1 + amp * n) * this.radius;
 
-      if (i === 0) {
-        context.moveTo(px, py);
-      } else {
-        context.lineTo(px, py);
-      }
-    }
+    //   const px = ox + this.x + Math.cos(a) * rw;
+    //   const py = oy + this.y + Math.sin(a) * rw;
+
+    //   if (i === 0) {
+    //     context.moveTo(px, py);
+    //   } else {
+    //     context.lineTo(px, py);
+    //   }
+    // }
     context.closePath();
 
     context.stroke();

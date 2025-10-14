@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-
   import Overlay from "$lib/ui/Overlay.svelte";
+  import { onMount } from "svelte";
   import { InputEvent } from "$lib/io/input";
   import { Renderer } from "$lib/view/renderer";
   import { PlayerAction } from "$lib/world/player";
   import { game } from "$lib/game.svelte";
+  import { mode } from "mode-watcher";
 
   let overlay: Overlay | undefined = $state();
   let canvas: HTMLCanvasElement | undefined = $state();
@@ -99,7 +99,7 @@
   onmousemove={game.input.onmousemove.bind(game.input)}
   {width}
   {height}
-  class="absolute w-screen h-screen bg-[#F2FBFF] cursor-crosshair"
+  class="absolute w-screen h-screen cursor-crosshair bg-[{ mode.current === "dark" ? "#111111" : "#F2FBFF" }]"
   oncontextmenu={(event: MouseEvent) => event.preventDefault()}
 >
 </canvas>

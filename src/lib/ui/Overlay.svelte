@@ -6,6 +6,7 @@
   import { fade, fly } from "svelte/transition";
   import { derived, writable } from "svelte/store";
   import { Camera } from "$lib/view/camera.ts";
+  import { mode, ModeWatcher, toggleMode } from "mode-watcher";
 
   type Event =
     & { id: number }
@@ -81,6 +82,8 @@
   <span class:text-red-300={killed === $world?.localPlayer}>{killed.name}</span>
 {/snippet}
 
+<ModeWatcher />
+
 <div class="font-semibold text-lg absolute z-1 grid w-full h-full overflow-hidden pointer-events-none text-white">
   {#if $world}
     {#if $world?.localPlayer}
@@ -94,11 +97,27 @@
         {#each $players as player, i}
           {@const local = player === $world?.localPlayer}
           <span class="w-5 text-right" class:text-red-300={local}>{i + 1}.</span>
-          <span class:text-red-300={local}>{player.name}</span>
+          <button
+            class="w-fit pointer-events-auto"
+            onclick={() => {
+              if (!$world?.localPlayer?.alive) {
+                $camera!.target = player;
+              }
+            }}
+          >
+            <span class:text-red-300={local}>{player.name}</span>
+          </button>
         {/each}
       </div>
     </div>
     <div class="absolute m-4 justify-self-end self-end flex gap-2">
+      <button class="p-4 bg-black/40 pointer-events-auto cursor-pointer" onclick={toggleMode}>
+        {#if mode.current === "light"}
+          <Icon.Sun />
+        {:else}
+          <Icon.Moon />
+        {/if}
+      </button>
       <button class="p-4 bg-black/40 pointer-events-auto cursor-pointer" onclick={() => game.settings.muted = !game.settings.muted}>
         {#if game.settings.muted}
           <Icon.VolumeX />

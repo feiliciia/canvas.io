@@ -6,6 +6,7 @@ import { Virus } from "./virus.ts";
 import { Sound } from "../io/audio.ts";
 import { game, GameEvent } from "../game.svelte.ts";
 import { clamp } from "../utilities.ts";
+import { mode } from "mode-watcher";
 
 export type WorldConfig = {
   id: string;
@@ -33,7 +34,7 @@ export class Grid implements IDrawable {
     const ey = camera.zoom.get() > 1.0 ? camera.height : camera.height * camera.zoomInverse;
 
     context.lineWidth = 0.5;
-    context.strokeStyle = "#CFD7DA";
+    context.strokeStyle = mode.current === "dark" ? "#2C2C2C" : "#CFD7DA";
     context.beginPath();
 
     const offsetX = (sx + camera.x.get()) % this.size;
