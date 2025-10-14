@@ -101,7 +101,7 @@ export class Camera {
     renderer.context.translate(-this.halfWidth, -this.halfHeight);
   }
 
-  public zoomUser(delta: number) {
+  public updateZoom(delta: number) {
     this.userZoom = clamp(this.userZoom - clamp(delta, -1, 1) / 4, 1 / 2, 2);
   }
 }

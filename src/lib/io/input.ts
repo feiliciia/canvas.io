@@ -1,3 +1,4 @@
+import { game } from "../game.svelte.ts";
 import { clamp } from "../utilities.ts";
 
 export type KeyboardCallback = (event: KeyboardEvent) => void;
@@ -7,27 +8,27 @@ export type KeyCode = string;
 
 export const enum InputEvent {
   Zoom,
-  Move,
+  Target,
   Eject,
   Split,
 }
 
-type InputEventMap = {
+type InputCallbacks = {
   [InputEvent.Zoom]: (delta: number) => void;
-  [InputEvent.Move]: (x: number, y: number) => void;
+  [InputEvent.Target]: (x: number, y: number) => void;
   [InputEvent.Eject]: () => void;
   [InputEvent.Split]: () => void;
 };
 
-type Callback<E extends InputEvent> = InputEventMap[E];
+type Callback<E extends InputEvent> = InputCallbacks[E];
 
 // deno-lint-ignore no-unused-vars
-class CallbackMap extends Map<InputEvent, InputEventMap[InputEvent]> {
-  override get<E extends InputEvent>(event: E): InputEventMap[E] | undefined {
-    return super.get(event) as InputEventMap[E] | undefined;
+class CallbackMap extends Map<InputEvent, InputCallbacks[InputEvent]> {
+  override get<E extends InputEvent>(event: E): InputCallbacks[E] | undefined {
+    return super.get(event) as InputCallbacks[E] | undefined;
   }
 
-  override set<E extends InputEvent>(event: E, callback: InputEventMap[E]): this {
+  override set<E extends InputEvent>(event: E, callback: InputCallbacks[E]): this {
     return super.set(event, callback);
   }
 }
@@ -37,9 +38,6 @@ export class Input {
   private keystates: Map<KeyCode, boolean>;
   private keybinds: Map<KeyCode, InputEvent>;
 
-  private mouseX: number;
-  private mouseY: number;
-
   public constructor() {
     this.callbacks = new Map();
     this.keystates = new Map();
@@ -47,13 +45,38 @@ export class Input {
       ["Space", InputEvent.Split],
       ["KeyW", InputEvent.Eject],
     ]);
-
-    this.mouseX = 0;
-    this.mouseY = 0;
   }
 
   public onmousemove(e: MouseEvent) {
-    this.callbacks.get(InputEvent.Move)?.(e.x, e.y);
+    if (!game.renderer) {
+      return;
+    }
+
+    const canvas = game.renderer.canvas;
+    const camera = game.camera;
+
+    // mouse position
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    // canvas rect calculations
+    const rect = canvas.getBoundingClientRect();
+    const x = (mouseX - rect.left) * (canvas.width / rect.width);
+    const y = (mouseY - rect.top) * (canvas.height / rect.height);
+
+    // canvas center
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    // offset from center
+    const offsetX = x - centerX;
+    const offsetY = y - centerY;
+
+    // world based coordinates
+    const worldX = camera.x.get() + offsetX / camera.zoom.get();
+    const worldY = camera.y.get() + offsetY / camera.zoom.get();
+
+    this.callbacks.get(InputEvent.Target)?.(worldX, worldY);
   }
 
   public onwheel(e: WheelEvent) {

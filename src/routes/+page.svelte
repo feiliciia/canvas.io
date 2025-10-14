@@ -7,6 +7,7 @@
   import { Renderer } from "../lib/view/renderer";
   import { Sound } from "$lib/io/audio";
   import { Center } from "$lib/view/camera";
+  import { PlayerAction } from "$lib/world/player";
 
   let canvas: HTMLCanvasElement | undefined = $state();
   let width = $state(0);
@@ -22,12 +23,13 @@
   });
 
   onMount(async () => {
-    await game.audio.load();
-
     game.renderer = new Renderer(canvas!);
-    game.world = await World.loadFromServer();
-    game.world.localPlayer = await game.world.spawnPlayer();
-    game.camera.target = game.world.localPlayer;
+
+    await game.audio.load();
+    await game.loadWorld();
+
+    game.world!.localPlayer = await game.spawnPlayer();
+    game.camera.target = game.world!.localPlayer!;
 
     // lisa: uncomment this !!! :D Lol
     // let i = 0;
@@ -36,26 +38,39 @@
     //   i += 1;
     // }, 2000);
 
-    // FIXME: rebrand tx/ty!
-    game.input.on(InputEvent.Move, (x: number, y: number) => {
-      const renderer = game.renderer!;
-      const localPlayer = game.world!.localPlayer!;
-
-      for (const cell of localPlayer.cells) {
-        cell.tx = (renderer.canvas.clientLeft + x - 0.5 * renderer.canvas.width) * game.camera.zoomInverse;
-        cell.ty = (renderer.canvas.clientTop + y - 0.5 * renderer.canvas.height) * game.camera.zoomInverse;
+    const interval = setInterval(async () => {
+      if (game.world!.players.length === 10) {
+        clearInterval(interval);
       }
+
+      const player = await game.spawnPlayer();
+
+      setInterval(() => {
+        const size = game.world?.config.size ?? 0;
+        const x = -size / 2 + Math.random() * size;
+        const y = -size / 2 + Math.random() * size;
+        player?.action(PlayerAction.Target, { x, y });
+      }, 500 + Math.random() * 5000);
+
+      setInterval(() => {
+        player?.action(PlayerAction.Split, undefined);
+      }, 3000 + Math.random() * 7000);
+    }, 1000 + Math.random() * 3000);
+
+    // FIXME: rebrand tx/ty!
+    // x and y should be relative to the world
+    // i.e. where the mouse currently is in world spacTarget
+    game.input.on(InputEvent.Target, (x: number, y: number) => {
+      game.world?.localPlayer?.action(PlayerAction.Target, { x, y });
     });
 
     game.input.on(InputEvent.Zoom, (delta: number) => {
-      game.camera.zoomUser(delta);
+      game.camera.updateZoom(delta);
     });
 
+    // FIXME: sound should play based on PlayerAction and not InputEvent
     game.input.on(InputEvent.Split, () => {
-      const success = game.world?.localPlayer?.split(game.world);
-      if (success) {
-        game.audio.play(Sound.Split, 0.6);
-      }
+      game.world?.localPlayer?.action(PlayerAction.Split, undefined);
     });
 
     game.input.on(InputEvent.Eject, () => {

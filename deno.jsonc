@@ -18,7 +18,7 @@
     "lucide-svelte": "npm:lucide-svelte@^0.545.0",
     "svelte": "npm:svelte@^5.39.12",
     "tailwindcss": "npm:tailwindcss@^4.1.14",
-    "vite": "npm:vite@^7.1.9"
+    "vite": "npm:vite@^7.1.10"
   },
   "fmt": {
     "lineWidth": 160,

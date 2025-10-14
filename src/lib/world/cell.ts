@@ -21,23 +21,22 @@ export class Cell implements IDrawable {
     return this.#radius;
   }
 
-  // target x / y relative to cell on canvas
-  public tx: number;
-  public ty: number;
-
-  // mouse movement -1 ~ 1 - x / y
-  // the vector direction where a cell is "facing"
-  public mx: number;
-  public my: number;
-
-  // `vx` / `vy` are velocities - how strongly is the blob moving on each axis
-  // velocity decays over time due to friction
-  public vx: number;
-  public vy: number;
-
-  // `x` / `y` are currently drawn positions
+  // current position
   public x: number;
   public y: number;
+
+  // target position relative to the world
+  public targetX: number;
+  public targetY: number;
+
+  // precomputed direction on each axis
+  // calculated from x / y and targetX / targetY
+  public directionX: number;
+  public directionY: number;
+
+  // velocity from splitting / exploding, decays over time
+  public velocityX: number;
+  public velocityY: number;
 
   public texture: Texture;
   public name?: string;
@@ -51,14 +50,14 @@ export class Cell implements IDrawable {
   public constructor(x: number, y: number, mass: number, texture: Texture, name?: string) {
     this.#mass = mass;
     this.#radius = massToRadius(mass);
-    this.tx = 0;
-    this.ty = 0;
-    this.mx = 0.0;
-    this.my = 0.0;
-    this.vx = 0.0;
-    this.vy = 0.0;
     this.x = x;
     this.y = y;
+    this.targetX = x;
+    this.targetY = y;
+    this.directionX = 0.0;
+    this.directionY = 0.0;
+    this.velocityX = 0.0;
+    this.velocityY = 0.0;
     this.texture = texture;
     this.name = name;
     this.mergeTimeout = 0;
@@ -67,29 +66,52 @@ export class Cell implements IDrawable {
   public clone(): Cell {
     const cell = new Cell(this.x, this.y, this.mass, this.texture, this.name);
     cell.parent = this.parent;
-    cell.tx = this.tx;
-    cell.ty = this.ty;
-    cell.mx = this.mx;
-    cell.my = this.my;
-    cell.vx = this.vx;
-    cell.vy = this.vy;
+    cell.targetX = this.targetX;
+    cell.targetY = this.targetY;
+    cell.directionX = this.directionX;
+    cell.directionY = this.directionY;
+    cell.velocityX = this.velocityX;
+    cell.velocityY = this.velocityY;
     return cell;
   }
 
-  public move(camera: Camera) {
-    const width = camera.width;
-    const height = camera.height;
+  // public updateDirection(camera: Camera) {
+  //   const width = camera.width;
+  //   const height = camera.height;
 
-    const relativeBlobX = camera.x.get() - this.x + this.tx;
-    const relativeBlobY = camera.y.get() - this.y + this.ty;
+  //   const relativeBlobX = camera.x.get() - this.x + this.targetX;
+  //   const relativeBlobY = camera.y.get() - this.y + this.targetY;
 
-    const distanceMax = 0.25 * Math.min(width, height);
-    const distanceFromCenter = Math.hypot(relativeBlobX, relativeBlobY);
-    const distanceToMaxRatio = distanceMax / Math.max(distanceFromCenter, 0.00001);
-    const distance = clamp(distanceFromCenter, 0, distanceMax);
+  //   const distanceMax = 0.25 * Math.min(width, height);
+  //   const distanceFromCenter = Math.hypot(relativeBlobX, relativeBlobY);
+  //   const distanceToMaxRatio = distanceMax / Math.max(distanceFromCenter, 0.00001);
+  //   const distance = clamp(distanceFromCenter, 0, distanceMax);
 
-    this.mx = relativeBlobX * distanceToMaxRatio * distance / (distanceMax * distanceMax);
-    this.my = relativeBlobY * distanceToMaxRatio * distance / (distanceMax * distanceMax);
+  //   this.directionX = relativeBlobX * distanceToMaxRatio * distance / (distanceMax * distanceMax);
+  //   this.directionY = relativeBlobY * distanceToMaxRatio * distance / (distanceMax * distanceMax);
+  // }
+
+  public updateDirection() {
+    // how far are we from the target point?
+    const deltaX = this.targetX - this.x;
+    const deltaY = this.targetY - this.y;
+
+    // max movement radius
+    const maxDistance = 2 * this.radius;
+
+    const distance = Math.hypot(deltaX, deltaY);
+    if (distance < 0.0001) {
+      this.directionX = 0;
+      this.directionY = 0;
+      return;
+    }
+
+    const scale = Math.min(1, maxDistance / distance);
+    const circleX = deltaX * scale;
+    const circleY = deltaY * scale;
+
+    this.directionX = circleX / maxDistance;
+    this.directionY = circleY / maxDistance;
   }
 
   public canEat(other: Cell): boolean {
