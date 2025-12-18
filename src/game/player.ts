@@ -1,6 +1,6 @@
-import type { Drawable } from "./common.ts";
-import { Blob } from "./blob.ts"; //hello
-import { Renderer } from "./renderer.ts";
+import type { Drawable } from "./common";
+import { Blob } from "./blob"; //hello
+import { Renderer } from "./renderer";
 
 export class Player implements Drawable {
   blobs: Blob[];

@@ -1,5 +1,5 @@
-import { colors } from "./consts.ts";
-import { Renderer } from "./renderer.ts";
+import { colors } from "./consts";
+import { Renderer } from "./renderer";
 
 //interface for methods
 export interface Drawable {

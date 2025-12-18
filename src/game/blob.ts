@@ -1,7 +1,7 @@
-import { Renderer } from "./renderer.ts";
-import type { Drawable } from "./common.ts";
-import { MAP_SIZE } from "./consts.ts";
-import { clamp, randomColor } from "./common.ts";
+import { Renderer } from "./renderer";
+import type { Drawable } from "./common";
+import { MAP_SIZE } from "./consts";
+import { clamp, randomColor } from "./common";
 
 export class Blob implements Drawable {
   x: number;
@@ -13,8 +13,10 @@ export class Blob implements Drawable {
   speed: number;
   name?: string; //? kinda mostly the same as | undefined
   //leader?: boolean;
+  targetX?: number;
+  targetY?: number;
 
-  constructor(x: number, y: number, radius: number, color: string, speed: number, name?: string) {
+  constructor(x: number, y: number, radius: number, color: string, speed: number, name?: string, targetX?: number, targetY?: number) {
     this.x = x;
     this.y = y;
     this.vx = 0;
@@ -23,7 +25,8 @@ export class Blob implements Drawable {
     this.color = color;
     this.speed = speed;
     this.name = name;
-    //this.leader = leader;
+    this.targetX = targetX ?? x; 
+    this.targetY = targetY ?? y;
   }
 
   static random(): Blob {
@@ -74,12 +77,15 @@ export class Blob implements Drawable {
   // maybe add an varuable for that newx and newy, ot maybe have a leader blob what positionm stays
   // and for the clones the positiob jumps to +50 wahatever, idk
   clone(): Blob {
-    const x = this.x;
-    const y = this.y;
+    let x = this.x;
+    let y = this.y;
     //its moving the blob from the original position, baaaaaaaaaaaad
-    const jx = x - ((x - 50) * 0.3);
-    const jy = y - ((y - 50) * 0.3);
-
-    return new Blob(jx, jy, this.radius, this.color, this.speed, this.name);
+    // const jx = x - ((x - 50) * 0.3);
+    // const jy = y - ((y - 50) * 0.3);
+ 
+    x += (this.x - 50) * 0.5;
+    y += (this.y - 50) * 0.5;
+    
+    return new Blob(this.x, this.y, this.radius, this.color, this.speed, this.name, this.targetX, this.targetY);
   }
 }

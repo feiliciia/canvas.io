@@ -1,4 +1,4 @@
-import { Camera } from "./camera.ts";
+import { Camera } from "./camera";
 
 export class Renderer {
   canvas?: HTMLCanvasElement;

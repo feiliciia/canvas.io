@@ -1,7 +1,7 @@
-import type { Drawable } from "./common.ts";
-import { Renderer } from "./renderer.ts";
-import { Blob } from "./blob.ts";
-import { Player } from "./player.ts";
+import type { Drawable } from "./common";
+import { Renderer } from "./renderer";
+import { Blob } from "./blob";
+import { Player } from "./player";
 
 export class World implements Drawable {
   players: Player[];
